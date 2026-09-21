@@ -1,0 +1,3382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PianoLit Flashcards — Piano Literature Audio Flashcards</title>
+  
+  <!-- Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       CONSOLIDATED LINEAR DESIGN SYSTEM
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-deep: #030304;
+      --bg-base: #070709;
+      --bg-surface: rgba(255, 255, 255, 0.04);
+      --bg-surface-hover: rgba(255, 255, 255, 0.08);
+
+      --foreground: #EDEDEF;
+      --foreground-muted: #8E94A0;
+      
+      --accent: #5E6AD2;
+      --accent-bright: #6872D9;
+      --accent-glow: rgba(94, 106, 210, 0.28);
+      --accent-soft: rgba(94, 106, 210, 0.12);
+
+      --anki-again: #F43F5E;
+      --anki-again-bg: rgba(244, 63, 94, 0.12);
+      --anki-hard: #FB923C;
+      --anki-hard-bg: rgba(251, 146, 60, 0.12);
+      --anki-good: #10B981;
+      --anki-good-bg: rgba(16, 185, 129, 0.12);
+      --anki-easy: #38BDF8;
+      --anki-easy-bg: rgba(56, 189, 248, 0.12);
+      --rose: #F43F5E;
+
+      --border-default: rgba(255, 255, 255, 0.07);
+      --border-hover: rgba(255, 255, 255, 0.14);
+      --border-accent: rgba(94, 106, 210, 0.35);
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+      --radius-full: 9999px;
+
+      --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-fast: 180ms var(--ease-expo);
+      --transition-base: 260ms var(--ease-expo);
+
+      --shadow-card: 0 0 0 1px var(--border-default), 0 4px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--foreground);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Background */
+    .bg-ambient-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bg-base-radial {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top, #0d0e1a 0%, var(--bg-base) 55%, var(--bg-deep) 100%);
+    }
+
+    .ambient-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.18;
+    }
+    .blob-1 { width: 800px; height: 500px; top: -150px; left: 50%; transform: translateX(-50%); background: #5E6AD2; }
+    .blob-2 { width: 500px; height: 400px; bottom: -80px; left: -100px; background: #8B5CF6; opacity: 0.1; }
+
+    /* Compact Header */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      padding: 0.65rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: rgba(7, 7, 9, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+    }
+
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #6872D9 0%, #5E6AD2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .brand-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .deck-select-wrap {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .select-deck {
+      background: var(--accent-soft);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-full);
+      padding: 0.22rem 0.75rem;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: #A5B4FC;
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+    .select-deck:hover { background: rgba(94, 106, 210, 0.2); }
+    .select-deck:focus { box-shadow: 0 0 0 2px var(--accent-glow); }
+    .select-deck option { background: #0A0A0E; color: #EDEDEF; font-family: var(--font-sans); }
+
+    .header-icons {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border-default);
+      background: var(--bg-surface);
+      color: var(--foreground);
+      transition: var(--transition-fast);
+      user-select: none;
+      outline: none;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--border-hover);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent-bright);
+      color: #FFFFFF;
+      font-weight: 600;
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-bright);
+    }
+
+    .btn-pill {
+      border-radius: var(--radius-full);
+      padding: 0.25rem 0.65rem;
+      font-size: 0.74rem;
+    }
+
+    .btn-pill.active {
+      background: var(--accent-soft);
+      border-color: var(--border-accent);
+      color: #A5B4FC;
+      font-weight: 600;
+    }
+
+    .btn-icon {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Main Container */
+    .app-main {
+      flex: 1;
+      max-width: 760px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.1rem 1rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Consolidated Single Top Bar */
+    .unified-toolbar {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .tool-segment {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .segment-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--foreground-muted);
+      font-family: var(--font-mono);
+      margin-right: 0.15rem;
+    }
+
+    .select-sm {
+      background: #0A0A0F;
+      color: var(--foreground);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.55rem;
+      font-size: 0.75rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .select-sm:focus {
+      border-color: var(--accent);
+    }
+
+    /* 3D Flashcard Stage */
+    .flashcard-stage {
+      perspective: 1200px;
+      width: 100%;
+      min-height: 480px;
+      position: relative;
+    }
+
+    .flashcard-inner {
+      width: 100%;
+      min-height: 480px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s var(--ease-expo);
+      border-radius: var(--radius-lg);
+    }
+
+    .flashcard-stage.flipped .flashcard-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 480px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-card);
+      background: #09090D;
+    }
+
+    .card-front { transform: rotateY(0deg); }
+    .card-back { transform: rotateY(180deg); border-color: rgba(94, 106, 210, 0.25); }
+
+    /* Card Header */
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-progress-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--foreground-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .card-progress-badge strong {
+      color: var(--foreground);
+    }
+
+    .card-srs-pill {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-default);
+      color: #A5B4FC;
+    }
+
+    .card-srs-pill.learning { background: var(--anki-again-bg); color: #FDA4AF; border-color: rgba(244,63,94,0.3); }
+    .card-srs-pill.review { background: var(--anki-good-bg); color: #86EFAC; border-color: rgba(16,185,129,0.3); }
+    .card-srs-pill.new { background: var(--anki-easy-bg); color: #7DD3FC; border-color: rgba(56,189,248,0.3); }
+    .card-srs-pill.playlist { background: rgba(56, 189, 248, 0.15); color: #38BDF8; border-color: rgba(56,189,248,0.4); }
+
+    /* Consolidated Center Listening Hub */
+    .center-listening-hub {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0.2rem 0;
+    }
+
+    /* Blind Audio Visualizer Chamber */
+    .blind-chamber {
+      width: 100%;
+      height: 60px;
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: #050508;
+      border: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .yt-embed-host {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .yt-embed-host iframe { width: 100%; height: 100%; border: 0; }
+
+    .blind-shield {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 9, 13, 0.96);
+      backdrop-filter: blur(20px);
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    #wave-canvas { width: 100%; height: 100%; display: block; }
+
+    /* Playback Row */
+    .audio-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .play-btn-round {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 1px solid var(--accent-bright);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 16px var(--accent-glow);
+      transition: var(--transition-fast);
+      outline: none;
+    }
+    .play-btn-round:hover { background: var(--accent-bright); transform: scale(1.05); }
+    .play-btn-round.playing { background: #4F46E5; }
+    .play-btn-round svg { width: 22px; height: 22px; fill: currentColor; }
+
+    .icon-btn-round {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      color: var(--foreground-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+    .icon-btn-round:hover { color: var(--foreground); border-color: var(--border-hover); transform: rotate(45deg); }
+
+    .snippet-timer-line {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: #A5B4FC;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .mini-progress-bar {
+      width: 100px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .mini-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #5E6AD2, #38BDF8);
+      transition: width 0.2s linear;
+    }
+
+    /* Playlist On-Screen Info */
+    .playlist-info-card {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      text-align: center;
+      width: 100%;
+    }
+
+    .pl-title-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+    }
+
+    .pl-composer-text {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: #A5B4FC;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .pl-notes-text {
+      font-size: 0.78rem;
+      color: #CBD5E1;
+      line-height: 1.4;
+      max-width: 520px;
+      margin: 0.2rem auto 0;
+    }
+
+    .pl-nextup-text {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--foreground-muted);
+      margin-top: 0.3rem;
+      padding-top: 0.4rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Interactive Answer Box */
+    .interactive-answer-box {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    /* Multiple Choice */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.45rem;
+      width: 100%;
+    }
+
+    .choice-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 0.55rem 0.75rem;
+      text-align: left;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--foreground);
+      outline: none;
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      background: var(--bg-surface-hover);
+      border-color: var(--border-hover);
+    }
+
+    .choice-kbd {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 0.1rem 0.3rem;
+      color: #A5B4FC;
+    }
+
+    .choice-text {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .choice-key {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--foreground);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .choice-sub {
+      font-size: 0.68rem;
+      color: var(--foreground-muted);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .choice-btn.correct {
+      background: rgba(16, 185, 129, 0.18) !important;
+      border-color: #10B981 !important;
+    }
+    .choice-btn.correct .choice-key { color: #6EE7B7 !important; }
+
+    .choice-btn.wrong {
+      background: rgba(244, 63, 94, 0.18) !important;
+      border-color: #F43F5E !important;
+      opacity: 0.7;
+    }
+
+    /* Type Key Form */
+    .type-key-wrap {
+      display: flex;
+      gap: 0.4rem;
+      width: 100%;
+    }
+
+    .type-key-input {
+      flex: 1;
+      background: #050508;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 0.65rem 0.9rem;
+      color: #fff;
+      font-size: 0.86rem;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: var(--transition-fast);
+    }
+    .type-key-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+
+    .type-key-feedback {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.85rem;
+      font-size: 0.78rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .type-key-feedback.correct { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); color: #6EE7B7; }
+    .type-key-feedback.wrong { border-color: rgba(244, 63, 94, 0.4); background: rgba(244, 63, 94, 0.08); color: #FDA4AF; }
+
+    /* Card Back Content */
+    .back-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .piece-title-text {
+      font-size: 1.45rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    .meta-pills {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.55rem;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .meta-tag strong { color: #A5B4FC; font-family: var(--font-mono); }
+
+    .notes-box {
+      background: rgba(0, 0, 0, 0.35);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: #CBD5E1;
+    }
+
+    .back-links-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.74rem;
+    }
+
+    .yt-link {
+      color: #F87171;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .yt-link:hover { text-decoration: underline; color: #FCA5A5; }
+
+    .video-drawer {
+      width: 100%;
+      height: 150px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-default);
+      display: none;
+      background: #000;
+    }
+    .video-drawer.open { display: block; }
+
+    /* Anki 4-Button Grade Bar */
+    .anki-grade-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.45rem;
+      width: 100%;
+      margin-top: 0.2rem;
+    }
+
+    .anki-grade-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.55rem 0.35rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-default);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      gap: 0.15rem;
+      background: var(--bg-surface);
+    }
+    .anki-grade-btn:hover { transform: translateY(-2px); }
+    .anki-grade-btn:active { transform: scale(0.97); }
+
+    .grade-title { font-size: 0.8rem; font-weight: 600; }
+    .grade-interval { font-size: 0.68rem; font-family: var(--font-mono); opacity: 0.85; }
+
+    .anki-grade-btn.again { background: var(--anki-again-bg); border-color: rgba(244,63,94,0.3); color: #FDA4AF; }
+    .anki-grade-btn.again:hover { background: rgba(244,63,94,0.25); border-color: var(--anki-again); color: #fff; }
+
+    .anki-grade-btn.hard { background: var(--anki-hard-bg); border-color: rgba(251,146,60,0.3); color: #FDBA74; }
+    .anki-grade-btn.hard:hover { background: rgba(251,146,60,0.25); border-color: var(--anki-hard); color: #fff; }
+
+    .anki-grade-btn.good { background: var(--anki-good-bg); border-color: rgba(16,185,129,0.3); color: #86EFAC; }
+    .anki-grade-btn.good:hover { background: rgba(16,185,129,0.25); border-color: var(--anki-good); color: #fff; }
+
+    .anki-grade-btn.easy { background: var(--anki-easy-bg); border-color: rgba(56,189,248,0.3); color: #7DD3FC; }
+    .anki-grade-btn.easy:hover { background: rgba(56,189,248,0.25); border-color: var(--anki-easy); color: #fff; }
+
+    /* Bottom Navigation */
+    .deck-nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.85rem;
+    }
+
+    .keyboard-hint {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--foreground-muted);
+      margin-top: 0.2rem;
+    }
+    kbd {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      padding: 0.1rem 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--foreground);
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 2, 3, 0.85);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-base);
+      padding: 1.5rem;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .modal-dialog {
+      background: #0A0A0E;
+      border: 1px solid var(--border-hover);
+      border-radius: var(--radius-lg);
+      max-width: 600px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 0.9rem 1.25rem;
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-body { padding: 1.25rem; overflow-y: auto; flex: 1; }
+    .modal-footer {
+      padding: 0.75rem 1.25rem;
+      border-top: 1px solid var(--border-default);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #0E0F17;
+      border: 1px solid var(--border-accent);
+      color: #EDEDEF;
+      padding: 0.55rem 0.95rem;
+      border-radius: var(--radius-md);
+      font-size: 0.78rem;
+      z-index: 200;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all var(--transition-fast);
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 640px) {
+      .choices-grid { grid-template-columns: 1fr; }
+      .anki-grade-bar { grid-template-columns: repeat(2, 1fr); }
+      .keyboard-hint { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-ambient-layer">
+    <div class="bg-base-radial"></div>
+    <div class="ambient-blob blob-1"></div>
+    <div class="ambient-blob blob-2"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo">🎹</div>
+      <span class="brand-title">PianoLit Flashcards</span>
+    </div>
+
+    <!-- Deck Selector Switcher -->
+    <div class="deck-select-wrap">
+      <select id="deck-select" class="select-deck" title="Switch Repertoire Deck">
+        <option value="deck1">Listening Test 1 (22 Works)</option>
+        <option value="deck2">Listening Test 2 (41 Works / Movements)</option>
+      </select>
+    </div>
+
+    <div class="header-icons">
+      <button class="btn btn-pill" id="btn-reset-progress-header" title="Reset Anki intervals & learning progress for this deck" style="color:var(--rose); border-color:rgba(244,63,94,0.3);">
+        🔄 Reset Progress
+      </button>
+      <button class="btn btn-icon" id="btn-open-stats" title="Anki Spaced Repetition Stats">🧠</button>
+      <button class="btn btn-icon" id="btn-open-deck" title="Syllabus Repertoire">📋</button>
+      <button class="btn btn-icon" id="btn-open-help" title="Keyboard Shortcuts">❓</button>
+    </div>
+  </header>
+
+  <!-- Main Flashcard Workspace -->
+  <main class="app-main">
+
+    <!-- Unified Single Top Controls Bar -->
+    <div class="unified-toolbar">
+      <div class="tool-segment">
+        <span class="segment-label">Mode:</span>
+        <button class="btn btn-pill" id="btn-mode-order" title="Study in canonical syllabus order (1 → 2 → 3...)">
+          📖 In Order
+        </button>
+        <button class="btn btn-pill" id="btn-mode-shuffle" title="Shuffle through all pieces for randomized quiz testing">
+          🔀 Shuffle Quiz
+        </button>
+        <button class="btn btn-pill active" id="btn-mode-anki" title="Anki Spaced Repetition (Reviews due cards & learning queue)">
+          ⚡ Anki SRS
+        </button>
+        <button class="btn btn-pill" id="btn-mode-playlist" title="Continuous background playlist (plays full movements in sequence from start to end)">
+          🎧 Playlist
+        </button>
+      </div>
+
+      <div class="tool-segment" id="answer-mode-segment">
+        <span class="segment-label">Answer:</span>
+        <button class="btn btn-pill active" id="btn-ans-mc">🔘 Choice</button>
+        <button class="btn btn-pill" id="btn-ans-type">✍️ Type Key</button>
+        <button class="btn btn-pill" id="btn-ans-self">👁 Flip</button>
+      </div>
+
+      <div class="tool-segment">
+        <span class="segment-label">Snippet:</span>
+        <select id="snippet-select" class="select-sm">
+          <option value="20">20s</option>
+          <option value="30">30s</option>
+          <option value="40" selected>40s</option>
+          <option value="60">60s</option>
+          <option value="999">Full</option>
+        </select>
+      </div>
+
+      <div class="tool-segment">
+        <span class="segment-label">Filter:</span>
+        <select id="composer-select" class="select-sm"></select>
+      </div>
+    </div>
+
+    <!-- 3D Flashcard Stage -->
+    <div class="flashcard-stage" id="flashcard-container">
+      <div class="flashcard-inner">
+
+        <!-- ================= CARD FRONT ================= -->
+        <div class="card-face card-front">
+          <!-- Top Row: Card Progress & State -->
+          <div class="card-header-row">
+            <div class="card-progress-badge">
+              TRACK <strong id="card-num-curr">1</strong> / <span id="card-num-total">22</span>
+              <span class="card-srs-pill new" id="card-srs-badge">NEW</span>
+            </div>
+            <div id="playlist-auto-indicator" style="display:none; font-family:var(--font-mono); font-size:0.68rem; color:#38BDF8; align-items:center; gap:0.35rem;">
+              <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#38BDF8; animation:pulse 1.5s infinite;"></span>
+              AUTO-PLAYING
+            </div>
+          </div>
+
+          <!-- Center Audio Hub -->
+          <div class="center-listening-hub">
+            <!-- Blind YouTube Frame & Waveform -->
+            <div class="blind-chamber">
+              <div class="yt-embed-host">
+                <div id="yt-player-instance"></div>
+              </div>
+              <div class="blind-shield">
+                <canvas id="wave-canvas" width="460" height="60"></canvas>
+              </div>
+            </div>
+
+            <!-- Play Controls & Timeline -->
+            <div class="audio-controls-row">
+              <button class="icon-btn-round" id="btn-reroll-front" title="New Random Excerpt or Shuffle (R)">🎲</button>
+              
+              <button class="play-btn-round" id="btn-play-front" title="Play / Pause Audio (Space)">
+                <svg id="play-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <svg id="pause-icon" style="display:none;" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+              </button>
+
+              <button class="icon-btn-round" id="btn-restart-snippet" title="Replay Movement from Beginning">⏮</button>
+            </div>
+
+            <div class="snippet-timer-line">
+              <span id="timer-text">Excerpt: 00:00 → 00:40</span>
+              <div class="mini-progress-bar"><div class="mini-progress-fill" id="mini-progress-fill"></div></div>
+              <span id="remaining-text" style="color:var(--foreground-muted);">40s</span>
+            </div>
+          </div>
+
+          <!-- Playlist Live On-Screen Info (Shown without flipping when in Playlist Mode) -->
+          <div class="playlist-info-card" id="playlist-info-box" style="display:none;">
+            <div class="pl-composer-text" id="pl-composer">Johann Sebastian Bach</div>
+            <h2 class="pl-title-text" id="pl-title">Prelude in D Minor</h2>
+            <div class="meta-pills" style="justify-content:center;">
+              <div class="meta-tag">Key: <strong id="pl-key">D Minor</strong></div>
+              <div class="meta-tag">Catalog: <strong id="pl-catalog">BWV 851</strong></div>
+            </div>
+            <p class="pl-notes-text" id="pl-notes">Exam identification notes...</p>
+            <div class="pl-nextup-text" id="pl-nextup">Next up: Scarlatti — Sonata in D Major, K. 96</div>
+          </div>
+
+          <!-- Interactive Answer Area (Quiz Modes) -->
+          <div class="interactive-answer-box" id="quiz-answer-box">
+            <!-- 1: Multiple Choice Grid -->
+            <div class="choices-grid" id="choices-grid"></div>
+
+            <!-- 2: Type In Key Form -->
+            <div id="type-key-view" style="display:none; flex-direction:column; gap:0.4rem;">
+              <div class="type-key-wrap">
+                <input type="text" class="type-key-input" id="type-key-input" placeholder="Type key or piece name (e.g. D Minor, D, C#, Prelude, Fugue...) ↵" />
+                <button class="btn btn-primary" id="btn-type-key-submit">Check (↵)</button>
+              </div>
+              <div class="type-key-feedback" id="type-key-feedback">
+                <span id="type-key-feedback-msg"></span>
+                <button class="btn btn-pill" id="btn-type-flip-action">View Solution →</button>
+              </div>
+            </div>
+
+            <!-- 3: Self-Check Button -->
+            <button class="btn btn-primary" id="btn-flip-front" style="width:100%; padding:0.65rem;">
+              Reveal Solution (F / Enter)
+            </button>
+          </div>
+        </div>
+
+        <!-- ================= CARD BACK ================= -->
+        <div class="card-face card-back">
+          <div class="card-header-row">
+            <span style="font-family:var(--font-mono); font-size:0.75rem; color:#A5B4FC; text-transform:uppercase; letter-spacing:0.08em;" id="back-composer">
+              Domenico Scarlatti
+            </span>
+          </div>
+
+          <!-- Back Body -->
+          <div class="back-content">
+            <h2 class="piece-title-text" id="back-title">Sonata in A Major</h2>
+
+            <div class="meta-pills">
+              <div class="meta-tag">Key: <strong id="back-key">A Major</strong></div>
+              <div class="meta-tag">Catalog: <strong id="back-catalog">K. 322</strong></div>
+              <div class="meta-tag">Interval: <strong id="back-srs-info">0d (250%)</strong></div>
+            </div>
+
+            <div class="notes-box" id="back-notes">
+              Exam notes here...
+            </div>
+
+            <div class="back-links-row">
+              <a href="#" target="_blank" rel="noopener noreferrer" class="yt-link" id="back-yt-link">
+                ▶ Watch Performance on YouTube ↗
+              </a>
+              <button class="btn btn-pill" id="btn-toggle-video">👁 Video</button>
+            </div>
+
+            <div class="video-drawer" id="video-drawer">
+              <iframe id="video-drawer-frame" allow="autoplay; encrypted-media" style="width:100%; height:100%; border:0;"></iframe>
+            </div>
+          </div>
+
+          <!-- Bottom: Anki 4-Button Grade Bar -->
+          <div>
+            <div style="font-size:0.7rem; font-family:var(--font-mono); color:var(--foreground-muted); margin-bottom:0.35rem; display:flex; justify-content:space-between;">
+              <span>RATE RECALL (SM-2 SRS):</span>
+              <span>Keys: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></span>
+            </div>
+
+            <div class="anki-grade-bar">
+              <button class="anki-grade-btn again" id="btn-grade-again" title="Forgot (1)">
+                <span class="grade-title">✕ Again (1)</span>
+                <span class="grade-interval" id="lbl-grade-again">&lt; 1m</span>
+              </button>
+
+              <button class="anki-grade-btn hard" id="btn-grade-hard" title="Difficult (2)">
+                <span class="grade-title">▲ Hard (2)</span>
+                <span class="grade-interval" id="lbl-grade-hard">12h</span>
+              </button>
+
+              <button class="anki-grade-btn good" id="btn-grade-good" title="Correct (3)">
+                <span class="grade-title">✓ Good (3)</span>
+                <span class="grade-interval" id="lbl-grade-good">1d</span>
+              </button>
+
+              <button class="anki-grade-btn easy" id="btn-grade-easy" title="Instant Mastery (4)">
+                <span class="grade-title">★ Easy (4)</span>
+                <span class="grade-interval" id="lbl-grade-easy">4d</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="deck-nav-bar">
+      <button class="btn" id="btn-prev-card">← Prev</button>
+      <button class="btn" id="btn-restart-deck" title="Restart from beginning">Reset Order</button>
+      <button class="btn btn-primary" id="btn-next-card">Next Track →</button>
+    </div>
+
+    <div class="keyboard-hint">
+      <kbd>Space</kbd> Play/Pause &nbsp;•&nbsp; <kbd>→</kbd>/<kbd>←</kbd> Next/Prev &nbsp;•&nbsp; <kbd>A</kbd><kbd>B</kbd><kbd>C</kbd><kbd>D</kbd> Pick Choice &nbsp;•&nbsp; <kbd>Enter</kbd> Flip &nbsp;•&nbsp; <kbd>1</kbd>–<kbd>4</kbd> Rate Recall
+    </div>
+  </main>
+
+  <!-- ==========================================================================
+       MODAL 1: STATS
+       ========================================================================== -->
+  <div class="modal-overlay" id="modal-stats">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 style="font-size:0.95rem;">🧠 Anki Spaced Repetition Stats (<span id="modal-deck-title">Deck</span>)</h3>
+        <button class="btn btn-icon" id="btn-close-stats">✕</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:0.75rem;">
+        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:0.6rem;">
+          <div style="background:rgba(255,255,255,0.03); padding:0.75rem; border-radius:var(--radius-md); border:1px solid var(--border-default);">
+            <div style="font-size:1.3rem; font-weight:700; color:var(--anki-good);" id="stat-mastery-val">0%</div>
+            <div style="font-size:0.7rem; color:var(--foreground-muted); font-family:var(--font-mono);">DECK RETENTION</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03); padding:0.75rem; border-radius:var(--radius-md); border:1px solid var(--border-default);">
+            <div style="font-size:1.3rem; font-weight:700;" id="stat-reviews-val">0</div>
+            <div style="font-size:0.7rem; color:var(--foreground-muted); font-family:var(--font-mono);">REVIEWS TODAY</div>
+          </div>
+        </div>
+        <p style="font-size:0.78rem; color:var(--foreground-muted); line-height:1.45;">
+          Anki SRS schedules reviews based on your recall: pieces you struggle with (<span style="color:#FDA4AF;">Again / Hard</span>) re-queue immediately, while mastered works (<span style="color:#86EFAC;">Good / Easy</span>) space out across days and weeks.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" id="btn-reset-srs-data" style="color:var(--rose);">Reset Progress</button>
+        <button class="btn btn-primary" id="btn-close-stats-done">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 2: SYLLABUS
+       ========================================================================== -->
+  <div class="modal-overlay" id="modal-deck">
+    <div class="modal-dialog" style="max-width:680px;">
+      <div class="modal-header">
+        <h3 style="font-size:0.95rem;" id="modal-syllabus-title">📋 Listening Test Repertoire</h3>
+        <button class="btn btn-icon" id="btn-close-deck">✕</button>
+      </div>
+      <div class="modal-body" style="padding:0.75rem 1.25rem;">
+        <div style="max-height:360px; overflow-y:auto;">
+          <table style="width:100%; font-size:0.78rem; border-collapse:collapse; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border-default); color:var(--foreground-muted);">
+                <th style="padding:0.4rem;">#</th>
+                <th style="padding:0.4rem;">Composer</th>
+                <th style="padding:0.4rem;">Work</th>
+                <th style="padding:0.4rem;">Key</th>
+              </tr>
+            </thead>
+            <tbody id="syllabus-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btn-close-deck-done">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 3: HELP
+       ========================================================================== -->
+  <div class="modal-overlay" id="modal-help">
+    <div class="modal-dialog" style="max-width:440px;">
+      <div class="modal-header">
+        <h3 style="font-size:0.95rem;">Keyboard Shortcuts</h3>
+        <button class="btn btn-icon" id="btn-close-help">✕</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.8rem;">
+        <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem; border-bottom:1px solid var(--border-default);">
+          <span>Play / Pause</span><kbd>Space</kbd>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem; border-bottom:1px solid var(--border-default);">
+          <span>Select Choice</span><div><kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> or <kbd>1</kbd>–<kbd>4</kbd></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem; border-bottom:1px solid var(--border-default);">
+          <span>Flip Card / Submit</span><kbd>Enter</kbd> or <kbd>F</kbd>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem; border-bottom:1px solid var(--border-default);">
+          <span>Rate Recall (Back)</span><div><kbd>1</kbd> Again <kbd>2</kbd> Hard <kbd>3</kbd> Good <kbd>4</kbd> Easy</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem; border-bottom:1px solid var(--border-default);">
+          <span>Reroll Excerpt / Shuffle</span><kbd>R</kbd>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem;">
+          <span>Next / Prev</span><kbd>→</kbd> / <kbd>←</kbd>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btn-close-help-done">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Message</div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT REPERTOIRE & APP LOGIC
+       ========================================================================== -->
+  <script>
+    /**
+     * ==========================================================================
+     * REPERTOIRE DECK 1: LISTENING TEST 1 (22 Works: 4 Scarlatti + 9 Preludes + 9 Fugues)
+     * ==========================================================================
+     */
+    const LISTENING_TEST_1 = [
+      // Domenico Scarlatti Sonatas
+      {
+        id: "scarlatti-k322",
+        composer: "Domenico Scarlatti",
+        title: "Sonata in A Major",
+        catalog: "K. 322",
+        key: "A Major",
+        category: "Scarlatti",
+        type: "Sonata",
+        youtubeId: "yazvrHYi7HU",
+        startOffset: 0,
+        endOffset: 185,
+        safeBounds: [0, 185],
+        notes: "Pastoral, cheerful in 3/8 meter. Horn-call fifths, echoing phrases, and sparkling light texture."
+      },
+      {
+        id: "scarlatti-k27",
+        composer: "Domenico Scarlatti",
+        title: "Sonata in B Minor",
+        catalog: "K. 27",
+        key: "B Minor",
+        category: "Scarlatti",
+        type: "Sonata",
+        youtubeId: "AEeE_AB44wg",
+        startOffset: 0,
+        endOffset: 230,
+        safeBounds: [0, 230],
+        notes: "Introspective Allegro in 4/4 with expressive syncopations, sighing chromatic figures, and dramatic Spanish cantabile phrasing."
+      },
+      {
+        id: "scarlatti-k87",
+        composer: "Domenico Scarlatti",
+        title: "Sonata in B Minor",
+        catalog: "K. 87",
+        key: "B Minor",
+        category: "Scarlatti",
+        type: "Sonata",
+        youtubeId: "J7uNz4WZ8X8",
+        startOffset: 0,
+        endOffset: 290,
+        safeBounds: [0, 290],
+        notes: "Andante in 3/4. Deeply melancholic, 4-part continuous polyphony, aching suspensions, and vocal-like contrapuntal weaving."
+      },
+      {
+        id: "scarlatti-k96",
+        composer: "Domenico Scarlatti",
+        title: "Sonata in D Major",
+        catalog: "K. 96",
+        key: "D Major",
+        category: "Scarlatti",
+        type: "Sonata",
+        youtubeId: "Mse_r_2NMnU",
+        startOffset: 0,
+        endOffset: 250,
+        safeBounds: [0, 250],
+        notes: "Allegrissimo in 6/8 (\"La Caccia\"). Hunting-horn fanfare in D major, rapid repeated notes, wide hand-crossings, and castanet rhythm."
+      },
+
+      // J. S. Bach — WTC I Individual Preludes
+      {
+        id: "bach-bwv847-p",
+        composer: "Johann Sebastian Bach",
+        title: "Prelude in C Minor",
+        catalog: "BWV 847",
+        key: "C Minor",
+        category: "Prelude",
+        type: "Prelude",
+        youtubeId: "1GXHjxvSi24",
+        startOffset: 0,
+        endOffset: 85,
+        safeBounds: [0, 85],
+        notes: "Perpetual motion 16ths in 4/4 accelerating to Presto / Adagio cadenza."
+      },
+      {
+        id: "bach-bwv848-p",
+        composer: "Johann Sebastian Bach",
+        title: "Prelude in C-sharp Major",
+        catalog: "BWV 848",
+        key: "C-sharp Major",
+        category: "Prelude",
+        type: "Prelude",
+        youtubeId: "apz6yKXrKC8",
+        startOffset: 0,
+        endOffset: 80,
+        safeBounds: [0, 80],
+        notes: "Toccata-like 3/8 dance with sparkling broken chords and rapid hand crossings."
+      },
+      {
+        id: "bach-bwv850-p",
+        composer: "Johann Sebastian Bach",
+        title: "Prelude in D Major",
+        catalog: "BWV 850",
+        key: "D Major",
+        category: "Prelude",
+        type: "Prelude",
+        youtubeId: "0DOdfeJYZjg",
+        startOffset: 0,
+        endOffset: 72,
+        safeBounds: [0, 72],
+        notes: "Bubbling continuous 16th arpeggiation in 4/4 over steady bass line."
+      },
+      {
+        id: "bach-bwv851-p",
+        composer: "Johann Sebastian Bach",
+        title: "Prelude in D Minor",
+        catalog: "BWV 851",
+        key: "D Minor",
+        category: "Prelude",
+        type: "Prelude",
+        youtubeId: "vIPXYK5bR_g",
+        startOffset: 0,
+        endOffset: 88,
+        safeBounds: [0, 88],
+        notes: "Flowing 16th triplet figuration in 4/4 over walking bass line."
+      },
+      {
+        id: "bach-bwv855-p",
+        composer: "Johann Sebastian Bach",
+        title: "Prelude in E Minor",
+        catalog: "BWV 855",
+        key: "E Minor",
+        category: "Prelude",
+        type: "Prelude",
+        youtubeId: "3RKuS9IqBp4",
+        startOffset: 0,
+        endOffset: 125,
+        safeBounds: [0, 125],
+        notes: "Poignant cantabile melody over continuo chords, accelerating into a rapid Presto."
+      },
+      {
+        id: "bach-bwv860-p",
+        composer: "Johann Sebastian Bach",
+        title: "Prelude in G Major",
+        catalog: "BWV 860",
+        key: "G Major",
+        category: "Prelude",
+        type: "Prelude",
+        youtubeId: "hG-K-Q_fZIs",
+        startOffset: 0,
+        endOffset: 52,
+        safeBounds: [0, 52],
+        notes: "24/16 triplet perpetuum mobile with exuberant running arpeggios."
+      },
+      {
+        id: "bach-bwv862-p",
+        composer: "Johann Sebastian Bach",
+        title: "Prelude in A-flat Major",
+        catalog: "BWV 862",
+        key: "A-flat Major",
+        category: "Prelude",
+        type: "Prelude",
+        youtubeId: "ZCVVAxHRTs0",
+        startOffset: 0,
+        endOffset: 82,
+        safeBounds: [0, 82],
+        notes: "Majestic Italian concerto dialogue in 4/4 with graceful dotted figures."
+      },
+      {
+        id: "bach-bwv866-p",
+        composer: "Johann Sebastian Bach",
+        title: "Prelude in B-flat Major",
+        catalog: "BWV 866",
+        key: "B-flat Major",
+        category: "Prelude",
+        type: "Prelude",
+        youtubeId: "0MdizeVzYPQ",
+        startOffset: 0,
+        endOffset: 78,
+        safeBounds: [0, 78],
+        notes: "Virtuosic toccata in 4/4 with rapid cascading runs and broken chords."
+      },
+      {
+        id: "bach-bwv867-p",
+        composer: "Johann Sebastian Bach",
+        title: "Prelude in B-flat Minor",
+        catalog: "BWV 867",
+        key: "B-flat Minor",
+        category: "Prelude",
+        type: "Prelude",
+        youtubeId: "ih6YR6aiGP4",
+        startOffset: 0,
+        endOffset: 155,
+        safeBounds: [0, 155],
+        notes: "Somber 5-part sacred motet texture with deep pedal points and aching suspensions."
+      },
+
+      // J. S. Bach — WTC I Individual Fugues
+      {
+        id: "bach-bwv847-f",
+        composer: "Johann Sebastian Bach",
+        title: "Fugue in C Minor",
+        catalog: "BWV 847",
+        key: "C Minor",
+        category: "Fugue",
+        type: "Fugue",
+        youtubeId: "1GXHjxvSi24",
+        startOffset: 86,
+        endOffset: 185,
+        safeBounds: [86, 185],
+        notes: "3-voice fugue built on a lively mordent-like subject with two regular countersubjects."
+      },
+      {
+        id: "bach-bwv848-f",
+        composer: "Johann Sebastian Bach",
+        title: "Fugue in C-sharp Major",
+        catalog: "BWV 848",
+        key: "C-sharp Major",
+        category: "Fugue",
+        type: "Fugue",
+        youtubeId: "apz6yKXrKC8",
+        startOffset: 81,
+        endOffset: 220,
+        safeBounds: [81, 220],
+        notes: "Animated 3-voice fugue in 4/4 utilizing invertible counterpoint and joyous drive."
+      },
+      {
+        id: "bach-bwv850-f",
+        composer: "Johann Sebastian Bach",
+        title: "Fugue in D Major",
+        catalog: "BWV 850",
+        key: "D Major",
+        category: "Fugue",
+        type: "Fugue",
+        youtubeId: "0DOdfeJYZjg",
+        startOffset: 73,
+        endOffset: 190,
+        safeBounds: [73, 190],
+        notes: "4-voice French overture style with dotted rhythms and rapid 32nd-note flourishes."
+      },
+      {
+        id: "bach-bwv851-f",
+        composer: "Johann Sebastian Bach",
+        title: "Fugue in D Minor",
+        catalog: "BWV 851",
+        key: "D Minor",
+        category: "Fugue",
+        type: "Fugue",
+        youtubeId: "vIPXYK5bR_g",
+        startOffset: 89,
+        endOffset: 205,
+        safeBounds: [89, 205],
+        notes: "3-voice inversion & stretto masterclass with chromatic subject and relentless counterpoint."
+      },
+      {
+        id: "bach-bwv855-f",
+        composer: "Johann Sebastian Bach",
+        title: "Fugue in E Minor",
+        catalog: "BWV 855",
+        key: "E Minor",
+        category: "Fugue",
+        type: "Fugue",
+        youtubeId: "3RKuS9IqBp4",
+        startOffset: 126,
+        endOffset: 210,
+        safeBounds: [126, 210],
+        notes: "Sole 2-voice fugue in Book I; relentless toccata-like energy and rapid 16th dialogue."
+      },
+      {
+        id: "bach-bwv860-f",
+        composer: "Johann Sebastian Bach",
+        title: "Fugue in G Major",
+        catalog: "BWV 860",
+        key: "G Major",
+        category: "Fugue",
+        type: "Fugue",
+        youtubeId: "hG-K-Q_fZIs",
+        startOffset: 53,
+        endOffset: 155,
+        safeBounds: [53, 155],
+        notes: "Playful 3-voice 6/8 dance-like fugue with a long leaping subject."
+      },
+      {
+        id: "bach-bwv862-f",
+        composer: "Johann Sebastian Bach",
+        title: "Fugue in A-flat Major",
+        catalog: "BWV 862",
+        key: "A-flat Major",
+        category: "Fugue",
+        type: "Fugue",
+        youtubeId: "ZCVVAxHRTs0",
+        startOffset: 83,
+        endOffset: 215,
+        safeBounds: [83, 215],
+        notes: "Serene, warm 4-voice balance with singing counterpoint and noble architecture."
+      },
+      {
+        id: "bach-bwv866-f",
+        composer: "Johann Sebastian Bach",
+        title: "Fugue in B-flat Major",
+        catalog: "BWV 866",
+        key: "B-flat Major",
+        category: "Fugue",
+        type: "Fugue",
+        youtubeId: "0MdizeVzYPQ",
+        startOffset: 79,
+        endOffset: 180,
+        safeBounds: [79, 180],
+        notes: "Joyous 3-voice fugue featuring two distinct recurring countersubjects in triple counterpoint."
+      },
+      {
+        id: "bach-bwv867-f",
+        composer: "Johann Sebastian Bach",
+        title: "Fugue in B-flat Minor",
+        catalog: "BWV 867",
+        key: "B-flat Minor",
+        category: "Fugue",
+        type: "Fugue",
+        youtubeId: "ih6YR6aiGP4",
+        startOffset: 156,
+        endOffset: 335,
+        safeBounds: [156, 335],
+        notes: "Monumental 5-voice stile antico with dense stretti and solemn, profound vocal polyphony."
+      }
+    ];
+
+    /**
+     * ==========================================================================
+     * REPERTOIRE DECK 2: LISTENING TEST 2 (21 Works: 7 Preludes + 7 Fugues + 7 Major Works)
+     * ==========================================================================
+     */
+    const LISTENING_TEST_2 = [
+      // J. S. Bach — WTC II Individual Preludes (7)
+      {
+        id: "bach-bwv871-p",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Prelude",
+        title: "Prelude in C Minor",
+        catalog: "BWV 871",
+        key: "C Minor",
+        category: "WTC II Preludes",
+        type: "Prelude",
+        youtubeId: "YeRtTDf5sE4",
+        startOffset: 0,
+        endOffset: 120,
+        safeBounds: [0, 120],
+        notes: "Intimate 4-part polyphonic ricercar in 4/4 with quiet suspensions and cantabile lines."
+      },
+      {
+        id: "bach-bwv874-p",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Prelude",
+        title: "Prelude in D Major",
+        catalog: "BWV 874",
+        key: "D Major",
+        category: "WTC II Preludes",
+        type: "Prelude",
+        youtubeId: "nJZ_DHdG27Q",
+        startOffset: 0,
+        endOffset: 185,
+        safeBounds: [0, 185],
+        notes: "Expansive binary form (Sonata/Canzona) in 12/8 with horn-call fanfares and joyous dotted triplets."
+      },
+      {
+        id: "bach-bwv875-p",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Prelude",
+        title: "Prelude in D Minor",
+        catalog: "BWV 875",
+        key: "D Minor",
+        category: "WTC II Preludes",
+        type: "Prelude",
+        youtubeId: "0RZ5N6hVYA8",
+        startOffset: 0,
+        endOffset: 85,
+        safeBounds: [0, 85],
+        notes: "Dazzling 3/4 toccata with rapid 16th triplets, scalar sweeps, and expressive pauses."
+      },
+      {
+        id: "bach-bwv881-p",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Prelude",
+        title: "Prelude in F Minor",
+        catalog: "BWV 881",
+        key: "F Minor",
+        category: "WTC II Preludes",
+        type: "Prelude",
+        youtubeId: "HSUmYPny3qI",
+        startOffset: 0,
+        endOffset: 135,
+        safeBounds: [0, 135],
+        notes: "Gallant style 2/4 andante with sighing figures (Seufzer) and early classical sonata phrasing."
+      },
+      {
+        id: "bach-bwv884-p",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Prelude",
+        title: "Prelude in G Major",
+        catalog: "BWV 884",
+        key: "G Major",
+        category: "WTC II Preludes",
+        type: "Prelude",
+        youtubeId: "QE7pGc77rMQ",
+        startOffset: 0,
+        endOffset: 75,
+        safeBounds: [0, 75],
+        notes: "Sparkling 3/4 Italian concerto toccata with light dancing broken chords."
+      },
+      {
+        id: "bach-bwv886-p",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Prelude",
+        title: "Prelude in A-flat Major",
+        catalog: "BWV 886",
+        key: "A-flat Major",
+        category: "WTC II Preludes",
+        type: "Prelude",
+        youtubeId: "NAJa4YCoG0c",
+        startOffset: 0,
+        endOffset: 175,
+        safeBounds: [0, 175],
+        notes: "Monumental 3/4 concerto-allegro with rich full-voiced chords and expressive cantabile dialogue."
+      },
+      {
+        id: "bach-bwv889-p",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Prelude",
+        title: "Prelude in A Minor",
+        catalog: "BWV 889",
+        key: "A Minor",
+        category: "WTC II Preludes",
+        type: "Prelude",
+        youtubeId: "K47T6j-WyQU",
+        startOffset: 0,
+        endOffset: 120,
+        safeBounds: [0, 120],
+        notes: "Intensely dramatic, continuous driving dotted rhythm and angular chromatic counterpoint in 2/2."
+      },
+
+      // J. S. Bach — WTC II Individual Fugues (7)
+      {
+        id: "bach-bwv871-f",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Fugue",
+        title: "Fugue in C Minor",
+        catalog: "BWV 871",
+        key: "C Minor",
+        category: "WTC II Fugues",
+        type: "Fugue",
+        youtubeId: "YeRtTDf5sE4",
+        startOffset: 121,
+        endOffset: 240,
+        safeBounds: [121, 240],
+        notes: "4-voice fugue built on an expressive subject featuring leaps and chromatic descents."
+      },
+      {
+        id: "bach-bwv874-f",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Fugue",
+        title: "Fugue in D Major",
+        catalog: "BWV 874",
+        key: "D Major",
+        category: "WTC II Fugues",
+        type: "Fugue",
+        youtubeId: "nJZ_DHdG27Q",
+        startOffset: 186,
+        endOffset: 320,
+        safeBounds: [186, 320],
+        notes: "Stately 4-voice vocal polyphony in alla breve stile antico with solemn architecture."
+      },
+      {
+        id: "bach-bwv875-f",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Fugue",
+        title: "Fugue in D Minor",
+        catalog: "BWV 875",
+        key: "D Minor",
+        category: "WTC II Fugues",
+        type: "Fugue",
+        youtubeId: "0RZ5N6hVYA8",
+        startOffset: 86,
+        endOffset: 190,
+        safeBounds: [86, 190],
+        notes: "3 voices with brisk chromatic running 16ths and double counterpoint."
+      },
+      {
+        id: "bach-bwv881-f",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Fugue",
+        title: "Fugue in F Minor",
+        catalog: "BWV 881",
+        key: "F Minor",
+        category: "WTC II Fugues",
+        type: "Fugue",
+        youtubeId: "HSUmYPny3qI",
+        startOffset: 136,
+        endOffset: 260,
+        safeBounds: [136, 260],
+        notes: "3 voices with expressive suspensions and poignant chromaticism."
+      },
+      {
+        id: "bach-bwv884-f",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Fugue",
+        title: "Fugue in G Major",
+        catalog: "BWV 884",
+        key: "G Major",
+        category: "WTC II Fugues",
+        type: "Fugue",
+        youtubeId: "QE7pGc77rMQ",
+        startOffset: 76,
+        endOffset: 185,
+        safeBounds: [76, 185],
+        notes: "Playful 3-voice gigue-like fugue in 3/8 with a rapid running 16th subject."
+      },
+      {
+        id: "bach-bwv886-f",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Fugue",
+        title: "Fugue in A-flat Major",
+        catalog: "BWV 886",
+        key: "A-flat Major",
+        category: "WTC II Fugues",
+        type: "Fugue",
+        youtubeId: "NAJa4YCoG0c",
+        startOffset: 176,
+        endOffset: 310,
+        safeBounds: [176, 310],
+        notes: "Majestic 4-voice double fugue featuring a chromatic second subject."
+      },
+      {
+        id: "bach-bwv889-f",
+        composer: "Johann Sebastian Bach",
+        work: "Well-Tempered Clavier, Book II",
+        movement: "Fugue",
+        title: "Fugue in A Minor",
+        catalog: "BWV 889",
+        key: "A Minor",
+        category: "WTC II Fugues",
+        type: "Fugue",
+        youtubeId: "K47T6j-WyQU",
+        startOffset: 121,
+        endOffset: 245,
+        safeBounds: [121, 245],
+        notes: "Somber, uncompromising 3-voice fugue with chromatic passus duriusculus subject."
+      },
+
+      // Chromatic Fantasia and Fugue in D Minor, BWV 903 (2)
+      {
+        id: "bach-bwv903-fantasia",
+        composer: "Johann Sebastian Bach",
+        work: "Chromatic Fantasia & Fugue, BWV 903",
+        movement: "Fantasia",
+        title: "Chromatic Fantasia",
+        catalog: "BWV 903",
+        key: "D Minor",
+        category: "Chromatic Fantasia & Fugue",
+        type: "Major Work",
+        youtubeId: "lHTMq-5B9Co",
+        startOffset: 0,
+        endOffset: 413,
+        safeBounds: [0, 413],
+        notes: "Virtuosic improvisatory runs, arpeggiated figures, and expressive recitativo in D minor."
+      },
+      {
+        id: "bach-bwv903-fugue",
+        composer: "Johann Sebastian Bach",
+        work: "Chromatic Fantasia & Fugue, BWV 903",
+        movement: "Fugue",
+        title: "Chromatic Fugue",
+        catalog: "BWV 903",
+        key: "D Minor",
+        category: "Chromatic Fantasia & Fugue",
+        type: "Major Work",
+        youtubeId: "lHTMq-5B9Co",
+        startOffset: 414,
+        endOffset: 765,
+        safeBounds: [414, 765],
+        notes: "Monumental 3-voice fugue built on an ascending chromatic half-step subject in 3/4."
+      },
+
+      // Partita No. 2 in C Minor, BWV 826 (6)
+      {
+        id: "bach-bwv826-1",
+        composer: "Johann Sebastian Bach",
+        work: "Partita No. 2 in C Minor, BWV 826",
+        movement: "I. Sinfonia",
+        title: "Partita No. 2: I. Sinfonia",
+        catalog: "BWV 826",
+        key: "C Minor",
+        category: "Partita No. 2",
+        type: "Major Work",
+        youtubeId: "BRBHSy4l6bM",
+        startOffset: 11,
+        endOffset: 271,
+        safeBounds: [11, 271],
+        notes: "French overture design: solemn Grave Adagio in 4/4 with dotted rhythms, flowing Andante cantabile 3/4, and a lively 2-voice allegro fugato in 4/4."
+      },
+      {
+        id: "bach-bwv826-2",
+        composer: "Johann Sebastian Bach",
+        work: "Partita No. 2 in C Minor, BWV 826",
+        movement: "II. Allemande",
+        title: "Partita No. 2: II. Allemande",
+        catalog: "BWV 826",
+        key: "C Minor",
+        category: "Partita No. 2",
+        type: "Major Work",
+        youtubeId: "BRBHSy4l6bM",
+        startOffset: 272,
+        endOffset: 530,
+        safeBounds: [272, 530],
+        notes: "Continuous flowing 16th-note counterpoint in 4/4 with elegant phrasing and melodic sequences."
+      },
+      {
+        id: "bach-bwv826-3",
+        composer: "Johann Sebastian Bach",
+        work: "Partita No. 2 in C Minor, BWV 826",
+        movement: "III. Courante",
+        title: "Partita No. 2: III. Courante",
+        catalog: "BWV 826",
+        key: "C Minor",
+        category: "Partita No. 2",
+        type: "Major Work",
+        youtubeId: "BRBHSy4l6bM",
+        startOffset: 531,
+        endOffset: 663,
+        safeBounds: [531, 663],
+        notes: "Italian Corrente style in brisk 3/2 with running 8th notes and rhythmic vigor."
+      },
+      {
+        id: "bach-bwv826-4",
+        composer: "Johann Sebastian Bach",
+        work: "Partita No. 2 in C Minor, BWV 826",
+        movement: "IV. Sarabande",
+        title: "Partita No. 2: IV. Sarabande",
+        catalog: "BWV 826",
+        key: "C Minor",
+        category: "Partita No. 2",
+        type: "Major Work",
+        youtubeId: "BRBHSy4l6bM",
+        startOffset: 664,
+        endOffset: 874,
+        safeBounds: [664, 874],
+        notes: "Noble Spanish dance in slow 3/4 with characteristic second-beat weight and aching expressive ornaments."
+      },
+      {
+        id: "bach-bwv826-5",
+        composer: "Johann Sebastian Bach",
+        work: "Partita No. 2 in C Minor, BWV 826",
+        movement: "V. Rondeau",
+        title: "Partita No. 2: V. Rondeau",
+        catalog: "BWV 826",
+        key: "C Minor",
+        category: "Partita No. 2",
+        type: "Major Work",
+        youtubeId: "BRBHSy4l6bM",
+        startOffset: 875,
+        endOffset: 952,
+        safeBounds: [875, 952],
+        notes: "French galant rondo in 3/8 with a buoyant recurring refrain and contrasting episodes."
+      },
+      {
+        id: "bach-bwv826-6",
+        composer: "Johann Sebastian Bach",
+        work: "Partita No. 2 in C Minor, BWV 826",
+        movement: "VI. Capriccio",
+        title: "Partita No. 2: VI. Capriccio",
+        catalog: "BWV 826",
+        key: "C Minor",
+        category: "Partita No. 2",
+        type: "Major Work",
+        youtubeId: "BRBHSy4l6bM",
+        startOffset: 953,
+        endOffset: 1065,
+        safeBounds: [953, 1065],
+        notes: "Replaces traditional gigue with an electrifying 2-voice fugato in 2/4 featuring hand crossings and inverted subjects."
+      },
+
+      // English Suite No. 2 in A Minor, BWV 807 (6)
+      {
+        id: "bach-bwv807-1",
+        composer: "Johann Sebastian Bach",
+        work: "English Suite No. 2 in A Minor, BWV 807",
+        movement: "I. Prelude",
+        title: "English Suite No. 2: I. Prelude",
+        catalog: "BWV 807",
+        key: "A Minor",
+        category: "English Suite No. 2",
+        type: "Major Work",
+        youtubeId: "HguR3G0F_zg",
+        startOffset: 0,
+        endOffset: 263,
+        safeBounds: [0, 263],
+        notes: "Expansive concerto-grosso format in 3/4 with alternating tutti and solo contrapuntal textures."
+      },
+      {
+        id: "bach-bwv807-2",
+        composer: "Johann Sebastian Bach",
+        work: "English Suite No. 2 in A Minor, BWV 807",
+        movement: "II. Allemande",
+        title: "English Suite No. 2: II. Allemande",
+        catalog: "BWV 807",
+        key: "A Minor",
+        category: "English Suite No. 2",
+        type: "Major Work",
+        youtubeId: "HguR3G0F_zg",
+        startOffset: 264,
+        endOffset: 442,
+        safeBounds: [264, 442],
+        notes: "Stately 4/4 binary dance with continuous running 16th notes and imitative voices."
+      },
+      {
+        id: "bach-bwv807-3",
+        composer: "Johann Sebastian Bach",
+        work: "English Suite No. 2 in A Minor, BWV 807",
+        movement: "III. Courante",
+        title: "English Suite No. 2: III. Courante",
+        catalog: "BWV 807",
+        key: "A Minor",
+        category: "English Suite No. 2",
+        type: "Major Work",
+        youtubeId: "HguR3G0F_zg",
+        startOffset: 443,
+        endOffset: 535,
+        safeBounds: [443, 535],
+        notes: "French-style courante in 3/2 with shifting hemiolas between 6/4 and 3/2 metric groupings."
+      },
+      {
+        id: "bach-bwv807-4",
+        composer: "Johann Sebastian Bach",
+        work: "English Suite No. 2 in A Minor, BWV 807",
+        movement: "IV. Sarabande",
+        title: "English Suite No. 2: IV. Sarabande",
+        catalog: "BWV 807",
+        key: "A Minor",
+        category: "English Suite No. 2",
+        type: "Major Work",
+        youtubeId: "HguR3G0F_zg",
+        startOffset: 536,
+        endOffset: 785,
+        safeBounds: [536, 785],
+        notes: "Intensely solemn slow 3/4 dance, followed by Bach's own elaborate written-out ornamented repeats (Les agréments)."
+      },
+      {
+        id: "bach-bwv807-5",
+        composer: "Johann Sebastian Bach",
+        work: "English Suite No. 2 in A Minor, BWV 807",
+        movement: "V. Bourrée I & II",
+        title: "English Suite No. 2: V. Bourrée I & II",
+        catalog: "BWV 807",
+        key: "A Minor",
+        category: "English Suite No. 2",
+        type: "Major Work",
+        youtubeId: "HguR3G0F_zg",
+        startOffset: 786,
+        endOffset: 1023,
+        safeBounds: [786, 1023],
+        notes: "Lively cut-time (2/2) dance. Bourrée I in A minor, Bourrée II in A major musette over a drone bass, followed by Bourrée I da capo."
+      },
+      {
+        id: "bach-bwv807-6",
+        composer: "Johann Sebastian Bach",
+        work: "English Suite No. 2 in A Minor, BWV 807",
+        movement: "VI. Gigue",
+        title: "English Suite No. 2: VI. Gigue",
+        catalog: "BWV 807",
+        key: "A Minor",
+        category: "English Suite No. 2",
+        type: "Major Work",
+        youtubeId: "HguR3G0F_zg",
+        startOffset: 1024,
+        endOffset: 1245,
+        safeBounds: [1024, 1245],
+        notes: "Fugal 6/8 gigue with persistent trills on the subject; the second section presents the subject in inversion."
+      },
+
+      // French Suite No. 6 in E Major, BWV 817 (8)
+      {
+        id: "bach-bwv817-1",
+        composer: "Johann Sebastian Bach",
+        work: "French Suite No. 6 in E Major, BWV 817",
+        movement: "I. Allemande",
+        title: "French Suite No. 6: I. Allemande",
+        catalog: "BWV 817",
+        key: "E Major",
+        category: "French Suite No. 6",
+        type: "Major Work",
+        youtubeId: "kkNPezHTWzU",
+        startOffset: 5,
+        endOffset: 158,
+        safeBounds: [5, 158],
+        notes: "Gentle, singing binary dance in 4/4 with graceful arpeggiated contours in sunny E major."
+      },
+      {
+        id: "bach-bwv817-2",
+        composer: "Johann Sebastian Bach",
+        work: "French Suite No. 6 in E Major, BWV 817",
+        movement: "II. Courante",
+        title: "French Suite No. 6: II. Courante",
+        catalog: "BWV 817",
+        key: "E Major",
+        category: "French Suite No. 6",
+        type: "Major Work",
+        youtubeId: "kkNPezHTWzU",
+        startOffset: 159,
+        endOffset: 250,
+        safeBounds: [159, 250],
+        notes: "Brisk Italian corrente in 3/4 with continuous running 8th notes and buoyant pulse."
+      },
+      {
+        id: "bach-bwv817-3",
+        composer: "Johann Sebastian Bach",
+        work: "French Suite No. 6 in E Major, BWV 817",
+        movement: "III. Sarabande",
+        title: "French Suite No. 6: III. Sarabande",
+        catalog: "BWV 817",
+        key: "E Major",
+        category: "French Suite No. 6",
+        type: "Major Work",
+        youtubeId: "kkNPezHTWzU",
+        startOffset: 251,
+        endOffset: 440,
+        safeBounds: [251, 440],
+        notes: "Lyrical, expressive slow dance in 3/4 with singing cantilena line and tender second-beat emphasis."
+      },
+      {
+        id: "bach-bwv817-4",
+        composer: "Johann Sebastian Bach",
+        work: "French Suite No. 6 in E Major, BWV 817",
+        movement: "IV. Gavotte",
+        title: "French Suite No. 6: IV. Gavotte",
+        catalog: "BWV 817",
+        key: "E Major",
+        category: "French Suite No. 6",
+        type: "Major Work",
+        youtubeId: "kkNPezHTWzU",
+        startOffset: 441,
+        endOffset: 506,
+        safeBounds: [441, 506],
+        notes: "Cheerful, crisp 2/2 dance with a half-measure (two quarter-note) upbeat."
+      },
+      {
+        id: "bach-bwv817-5",
+        composer: "Johann Sebastian Bach",
+        work: "French Suite No. 6 in E Major, BWV 817",
+        movement: "V. Polonaise",
+        title: "French Suite No. 6: V. Polonaise",
+        catalog: "BWV 817",
+        key: "E Major",
+        category: "French Suite No. 6",
+        type: "Major Work",
+        youtubeId: "kkNPezHTWzU",
+        startOffset: 507,
+        endOffset: 599,
+        safeBounds: [507, 599],
+        notes: "Stately Polish court dance in 3/4 with signature syncopated cadence rhythm."
+      },
+      {
+        id: "bach-bwv817-6",
+        composer: "Johann Sebastian Bach",
+        work: "French Suite No. 6 in E Major, BWV 817",
+        movement: "VI. Menuet",
+        title: "French Suite No. 6: VI. Menuet",
+        catalog: "BWV 817",
+        key: "E Major",
+        category: "French Suite No. 6",
+        type: "Major Work",
+        youtubeId: "kkNPezHTWzU",
+        startOffset: 600,
+        endOffset: 690,
+        safeBounds: [600, 690],
+        notes: "Charming French court dance in moderate triple meter (3/4) with delicate, transparent texture."
+      },
+      {
+        id: "bach-bwv817-7",
+        composer: "Johann Sebastian Bach",
+        work: "French Suite No. 6 in E Major, BWV 817",
+        movement: "VII. Bourrée",
+        title: "French Suite No. 6: VII. Bourrée",
+        catalog: "BWV 817",
+        key: "E Major",
+        category: "French Suite No. 6",
+        type: "Major Work",
+        youtubeId: "kkNPezHTWzU",
+        startOffset: 691,
+        endOffset: 778,
+        safeBounds: [691, 778],
+        notes: "Sprightly cut-time dance with a single quarter-note upbeat and light, rhythmic bounce."
+      },
+      {
+        id: "bach-bwv817-8",
+        composer: "Johann Sebastian Bach",
+        work: "French Suite No. 6 in E Major, BWV 817",
+        movement: "VIII. Gigue",
+        title: "French Suite No. 6: VIII. Gigue",
+        catalog: "BWV 817",
+        key: "E Major",
+        category: "French Suite No. 6",
+        type: "Major Work",
+        youtubeId: "kkNPezHTWzU",
+        startOffset: 779,
+        endOffset: 920,
+        safeBounds: [779, 920],
+        notes: "Exuberant fugal gigue in 6/8 with sparkling running triplets and joyful contrapuntal banter."
+      },
+
+      // Italian Concerto in F Major, BWV 971 (3)
+      {
+        id: "bach-bwv971-1",
+        composer: "Johann Sebastian Bach",
+        work: "Italian Concerto in F Major, BWV 971",
+        movement: "I. Allegro",
+        title: "Italian Concerto: I. Allegro",
+        catalog: "BWV 971",
+        key: "F Major",
+        category: "Italian Concerto",
+        type: "Major Work",
+        youtubeId: "ghTitIMtTCM",
+        startOffset: 3,
+        endOffset: 223,
+        safeBounds: [3, 223],
+        notes: "Vivaldian ritornello concerto form in 2/4 with bold dynamic contrasts between forte (tutti orchestra) and piano (solo)."
+      },
+      {
+        id: "bach-bwv971-2",
+        composer: "Johann Sebastian Bach",
+        work: "Italian Concerto in F Major, BWV 971",
+        movement: "II. Andante",
+        title: "Italian Concerto: II. Andante",
+        catalog: "BWV 971",
+        key: "D Minor",
+        category: "Italian Concerto",
+        type: "Major Work",
+        youtubeId: "ghTitIMtTCM",
+        startOffset: 224,
+        endOffset: 491,
+        safeBounds: [224, 491],
+        notes: "Key shifts to D minor! Highly florid Italian cantilena aria in 3/4 over an unrelenting ostinato bass pattern."
+      },
+      {
+        id: "bach-bwv971-3",
+        composer: "Johann Sebastian Bach",
+        work: "Italian Concerto in F Major, BWV 971",
+        movement: "III. Presto",
+        title: "Italian Concerto: III. Presto",
+        catalog: "BWV 971",
+        key: "F Major",
+        category: "Italian Concerto",
+        type: "Major Work",
+        youtubeId: "ghTitIMtTCM",
+        startOffset: 492,
+        endOffset: 705,
+        safeBounds: [492, 705],
+        notes: "Dazzling virtuoso finale in 2/4 with sparkling scalar runs and exhilarating solo/tutti antiphony in F major."
+      },
+
+      // Goldberg Variations, BWV 988 (1)
+      {
+        id: "bach-bwv988",
+        composer: "Johann Sebastian Bach",
+        work: "Goldberg Variations, BWV 988",
+        movement: "Aria & Variations",
+        title: "Goldberg Variations",
+        catalog: "BWV 988",
+        key: "G Major",
+        category: "Goldberg Variations",
+        type: "Major Work",
+        youtubeId: "5Npa3G98Xlo",
+        startOffset: 0,
+        endOffset: 300,
+        safeBounds: [0, 300],
+        notes: "Aria followed by 30 variations on a 32-bar ground bass. You can identify this work as simply 'Goldberg Variations'."
+      },
+
+      // Toccata in D Major, BWV 912 (1)
+      {
+        id: "bach-bwv912",
+        composer: "Johann Sebastian Bach",
+        work: "Toccata in D Major, BWV 912",
+        movement: "Complete Toccata",
+        title: "Toccata in D Major",
+        catalog: "BWV 912",
+        key: "D Major",
+        category: "Toccata in D Major",
+        type: "Major Work",
+        youtubeId: "xlUN9NQNcNg",
+        startOffset: 0,
+        endOffset: 360,
+        safeBounds: [0, 360],
+        notes: "Multi-sectional early masterpiece: Presto opening fanfare, recitativo, Allegro fugato in 4/4, expressive Adagio in F# minor, and a 6/8 Gigue fugue finale."
+      }
+    ];
+
+    const DECKS = {
+      deck1: {
+        id: "deck1",
+        name: "Listening Test 1",
+        subtitle: "22 Works • Scarlatti Sonatas, Bach Preludes & Fugues",
+        filterOptions: [
+          { value: "all", label: "All Works (22)" },
+          { value: "Scarlatti", label: "Scarlatti Sonatas (4)" },
+          { value: "Prelude", label: "Bach Preludes (9)" },
+          { value: "Fugue", label: "Bach Fugues (9)" },
+          { value: "Bach", label: "All Bach (18)" }
+        ],
+        items: LISTENING_TEST_1
+      },
+      deck2: {
+        id: "deck2",
+        name: "Listening Test 2",
+        subtitle: "41 Works / Movements • WTC II, Suites, Partitas, Concerto & Variations",
+        filterOptions: [
+          { value: "all", label: "All Works & Movements (41)" },
+          { value: "WTC II Preludes", label: "WTC II Preludes (7)" },
+          { value: "WTC II Fugues", label: "WTC II Fugues (7)" },
+          { value: "Partita No. 2", label: "Partita No. 2 in C Minor (6)" },
+          { value: "English Suite No. 2", label: "English Suite No. 2 in A Minor (6)" },
+          { value: "French Suite No. 6", label: "French Suite No. 6 in E Major (8)" },
+          { value: "Italian Concerto", label: "Italian Concerto in F Major (3)" },
+          { value: "Chromatic Fantasia & Fugue", label: "Chromatic Fantasia & Fugue (2)" },
+          { value: "Goldberg Variations", label: "Goldberg Variations (1)" },
+          { value: "Toccata in D Major", label: "Toccata in D Major (1)" }
+        ],
+        items: LISTENING_TEST_2
+      }
+    };
+
+    /**
+     * ANKI SM-2 ENGINE (Per-Deck Persistent State)
+     */
+    const AnkiEngine = {
+      currentDeckId: "deck1",
+      data: {},
+      reviewsToday: 0,
+      sessionQueue: [],
+
+      init(deckId = "deck1") {
+        this.currentDeckId = deckId;
+        const stored = localStorage.getItem(`clavierflash_anki_data_${deckId}`);
+        this.data = stored ? JSON.parse(stored) : {};
+        this.reviewsToday = parseInt(localStorage.getItem(`clavierflash_anki_reviews_${deckId}`) || '0', 10);
+        this.sessionQueue = [];
+
+        const activeDeckObj = DECKS[deckId];
+        activeDeckObj.items.forEach(p => {
+          if (!this.data[p.id]) {
+            this.data[p.id] = { id: p.id, state: 'new', repetitions: 0, interval: 0, easeFactor: 2.5, dueDate: 0 };
+          }
+        });
+        this.save();
+      },
+
+      save() {
+        localStorage.setItem(`clavierflash_anki_data_${this.currentDeckId}`, JSON.stringify(this.data));
+        localStorage.setItem(`clavierflash_anki_reviews_${this.currentDeckId}`, String(this.reviewsToday));
+      },
+
+      getCard(id) {
+        return this.data[id] || { state: 'new', repetitions: 0, interval: 0, easeFactor: 2.5 };
+      },
+
+      getIntervals(id) {
+        const item = this.getCard(id);
+        const rep = item.repetitions;
+        const ef = item.easeFactor;
+        const cur = item.interval;
+
+        const againStr = "< 1m";
+        let hardDays = rep === 0 ? 0.5 : (cur <= 1 ? 1.2 : cur * 1.2);
+        const hardStr = hardDays < 1 ? `${Math.round(hardDays * 24)}h` : `${Math.round(hardDays)}d`;
+        let goodDays = rep === 0 ? 1 : (rep === 1 ? 3 : Math.round(cur * ef));
+        let easyDays = rep === 0 ? 4 : Math.round(cur * ef * 1.35);
+
+        return { again: againStr, hard: hardStr, good: `${goodDays}d`, easy: `${easyDays}d` };
+      },
+
+      rate(id, grade) {
+        const item = this.data[id];
+        if (!item) return;
+        const now = Date.now();
+        const oneDay = 86400000;
+        this.reviewsToday++;
+
+        if (grade === 1) {
+          item.repetitions = 0;
+          item.interval = 0;
+          item.easeFactor = Math.max(1.3, item.easeFactor - 0.20);
+          item.state = 'learning';
+          item.dueDate = now + 60000;
+          const currentItems = DECKS[this.currentDeckId].items;
+          const idx = currentItems.findIndex(p => p.id === id);
+          if (idx !== -1 && !this.sessionQueue.includes(idx)) this.sessionQueue.push(idx);
+        } else if (grade === 2) {
+          item.easeFactor = Math.max(1.3, item.easeFactor - 0.15);
+          item.interval = item.repetitions === 0 ? 0.5 : (item.interval <= 1 ? 1.2 : item.interval * 1.2);
+          item.repetitions++;
+          item.state = 'review';
+          item.dueDate = now + Math.round(item.interval * oneDay);
+        } else if (grade === 3) {
+          item.interval = item.repetitions === 0 ? 1 : (item.repetitions === 1 ? 3 : Math.round(item.interval * item.easeFactor));
+          item.repetitions++;
+          item.state = item.interval >= 21 ? 'mastered' : 'review';
+          item.dueDate = now + (item.interval * oneDay);
+        } else if (grade === 4) {
+          item.easeFactor = Math.min(3.2, item.easeFactor + 0.15);
+          item.interval = item.repetitions === 0 ? 4 : Math.round(item.interval * item.easeFactor * 1.35);
+          item.repetitions++;
+          item.state = item.interval >= 21 ? 'mastered' : 'review';
+          item.dueDate = now + (item.interval * oneDay);
+        }
+
+        this.save();
+      },
+
+      buildQueue() {
+        const now = Date.now();
+        const shuffle = (arr) => {
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+          return arr;
+        };
+
+        const currentItems = DECKS[this.currentDeckId].items;
+
+        // 1. Re-queued learning cards from current session
+        let learning = [...this.sessionQueue];
+        shuffle(learning);
+
+        // 2. Due review cards (dueDate <= now)
+        let due = [];
+        currentItems.forEach((p, idx) => {
+          const item = this.data[p.id];
+          if (item && item.state !== 'new' && item.dueDate <= now && !learning.includes(idx)) {
+            due.push(idx);
+          }
+        });
+        shuffle(due);
+
+        // 3. New cards (never studied or reset) - fully shuffled
+        let newCards = [];
+        currentItems.forEach((p, idx) => {
+          const item = this.data[p.id];
+          if (item && item.state === 'new' && !learning.includes(idx) && !due.includes(idx)) {
+            newCards.push(idx);
+          }
+        });
+        shuffle(newCards);
+
+        let queue = [...learning, ...due, ...newCards];
+
+        if (queue.length === 0) {
+          const sorted = currentItems.map((p, idx) => ({ idx, due: (this.data[p.id] ? this.data[p.id].dueDate : 0) }))
+            .sort((a, b) => a.due - b.due);
+          queue = sorted.map(s => s.idx);
+        }
+
+        return queue;
+      },
+
+      resetAll() {
+        this.data = {};
+        this.reviewsToday = 0;
+        this.sessionQueue = [];
+        localStorage.removeItem(`clavierflash_anki_data_${this.currentDeckId}`);
+        localStorage.setItem(`clavierflash_anki_reviews_${this.currentDeckId}`, '0');
+        this.init(this.currentDeckId);
+      }
+    };
+
+    /**
+     * APP STATE
+     */
+    const AppState = {
+      deckId: 'deck1',
+      repertoire: LISTENING_TEST_1,
+      orderMode: 'anki',    // 'anki' (SRS) | 'shuffle' (Random quiz) | 'playlist' (Continuous auto-advance)
+      answerMode: 'mc',     // 'mc' | 'type' | 'self'
+      composerFilter: 'all',
+      snippetLength: 40,
+      
+      activeDeck: [],
+      deckIndex: 0,
+      
+      isFlipped: false,
+      mcAnswered: false,
+      
+      currentExcerptStart: 0,
+      currentExcerptEnd: 40,
+      elapsedSnippetSec: 0,
+      isPlaying: false,
+      progressInterval: null
+    };
+
+    /**
+     * YOUTUBE PLAYER CONTROLLER
+     */
+    let ytPlayer = null;
+    let ytApiReady = false;
+    let pendingPlay = false;
+
+    (function loadYT() {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
+    })();
+
+    window.onYouTubeIframeAPIReady = function() {
+      const card = getCurrentCard();
+      ytPlayer = new YT.Player('yt-player-instance', {
+        height: '100%',
+        width: '100%',
+        videoId: card ? card.youtubeId : "yazvrHYi7HU",
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          rel: 0,
+          playsinline: 1,
+          enablejsapi: 1
+        },
+        events: {
+          'onReady': (e) => {
+            ytApiReady = true;
+            try {
+              e.target.unMute();
+              e.target.setVolume(100);
+            } catch(err) {}
+            if (pendingPlay) {
+              pendingPlay = false;
+              AudioEngine.play();
+            }
+          },
+          'onStateChange': (e) => {
+            if (e.data === YT.PlayerState.PLAYING) {
+              AppState.isPlaying = true;
+              updatePlayIcon(true);
+              Visualizer.start();
+              startCountdown();
+            } else if (e.data === YT.PlayerState.PAUSED) {
+              AppState.isPlaying = false;
+              updatePlayIcon(false);
+              Visualizer.stop();
+              stopCountdown();
+            } else if (e.data === YT.PlayerState.ENDED) {
+              AppState.isPlaying = false;
+              updatePlayIcon(false);
+              Visualizer.stop();
+              stopCountdown();
+              
+              // Continuous Playlist Auto-advance!
+              if (AppState.orderMode === 'playlist') {
+                showToast("🎵 Track complete! Playing next work...");
+                setTimeout(() => {
+                  nextCard(true);
+                }, 800);
+              }
+            }
+          },
+          'onError': (e) => {
+            console.warn("YouTube Player Error code:", e.data);
+            showToast("⚠️ Video playback error on this recording.");
+            AudioEngine.pause();
+          }
+        }
+      });
+    };
+
+    const AudioEngine = {
+      play() {
+        const card = getCurrentCard();
+        if (!card) return;
+
+        if (!ytApiReady || !ytPlayer || typeof ytPlayer.playVideo !== 'function') {
+          pendingPlay = true;
+          showToast("⏳ Connecting player...");
+          return;
+        }
+
+        const total = (AppState.snippetLength === 999 || AppState.orderMode === 'playlist')
+          ? 999999
+          : Math.max(1, AppState.currentExcerptEnd - AppState.currentExcerptStart);
+
+        let pState = -1;
+        try { pState = ytPlayer.getPlayerState ? ytPlayer.getPlayerState() : -1; } catch(e) {}
+        const isVideoEnded = (pState === YT.PlayerState.ENDED);
+
+        // Auto restart from start of excerpt if at the end
+        if (AppState.elapsedSnippetSec >= total || isVideoEnded) {
+          AppState.elapsedSnippetSec = 0;
+          updateTimerUI();
+        }
+
+        const target = Math.floor(AppState.currentExcerptStart + AppState.elapsedSnippetSec);
+
+        try {
+          ytPlayer.unMute();
+          ytPlayer.setVolume(100);
+
+          let curUrl = "";
+          try { curUrl = ytPlayer.getVideoUrl ? ytPlayer.getVideoUrl() : ""; } catch(e) {}
+
+          if (!curUrl || !curUrl.includes(card.youtubeId) || pState === -1 || pState === 5 || pState === 0) {
+            ytPlayer.loadVideoById({ videoId: card.youtubeId, startSeconds: target });
+          } else {
+            const curTime = ytPlayer.getCurrentTime ? ytPlayer.getCurrentTime() : 0;
+            if (Math.abs(curTime - target) > 1.5 || AppState.elapsedSnippetSec === 0) {
+              ytPlayer.seekTo(target, true);
+            }
+            ytPlayer.playVideo();
+          }
+
+          AppState.isPlaying = true;
+          updatePlayIcon(true);
+          Visualizer.start();
+          startCountdown();
+        } catch(err) {
+          console.error("AudioEngine play error:", err);
+          try {
+            ytPlayer.loadVideoById({ videoId: card.youtubeId, startSeconds: target });
+          } catch(e2) {}
+        }
+      },
+
+      pause() {
+        if (ytPlayer && ytApiReady && typeof ytPlayer.pauseVideo === 'function') {
+          try { ytPlayer.pauseVideo(); } catch(e) {}
+        }
+        AppState.isPlaying = false;
+        updatePlayIcon(false);
+        Visualizer.stop();
+        stopCountdown();
+      },
+
+      stop() {
+        if (ytPlayer && ytApiReady && typeof ytPlayer.stopVideo === 'function') {
+          try { ytPlayer.stopVideo(); } catch(e) {}
+        }
+        AppState.isPlaying = false;
+        updatePlayIcon(false);
+        Visualizer.stop();
+        stopCountdown();
+      },
+
+      load(card) {
+        if (ytPlayer && ytApiReady && typeof ytPlayer.cueVideoById === 'function') {
+          try {
+            ytPlayer.cueVideoById({ videoId: card.youtubeId, startSeconds: AppState.currentExcerptStart });
+          } catch(e) {}
+        }
+      }
+    };
+
+    function togglePlay() {
+      if (AppState.isPlaying) {
+        AudioEngine.pause();
+      } else {
+        AudioEngine.play();
+      }
+    }
+
+    /**
+     * SNIPPET & COUNTDOWN LOGIC
+     */
+    function calculateRandomStart(item, snippetLength) {
+      const minStart = (item.safeBounds && item.safeBounds[0] !== undefined) ? item.safeBounds[0] : (item.startOffset || 0);
+      const maxBound = (item.safeBounds && item.safeBounds[1] !== undefined) ? item.safeBounds[1] : (minStart + 180);
+      const latestPossible = Math.max(minStart, maxBound - snippetLength);
+      return Math.max(minStart, Math.floor(minStart + Math.random() * (latestPossible - minStart)));
+    }
+
+    function setupTimestamps() {
+      const card = getCurrentCard();
+      if (!card) return;
+
+      const cardStart = card.startOffset !== undefined ? card.startOffset : (card.safeBounds ? card.safeBounds[0] : 0);
+      const cardEnd = card.endOffset !== undefined ? card.endOffset : (card.safeBounds ? card.safeBounds[1] : (cardStart + 999999));
+
+      if (AppState.snippetLength === 999 || AppState.orderMode === 'playlist') {
+        AppState.currentExcerptStart = cardStart;
+        AppState.currentExcerptEnd = cardEnd;
+      } else {
+        AppState.currentExcerptStart = calculateRandomStart(card, AppState.snippetLength);
+        AppState.currentExcerptEnd = Math.min(cardEnd, AppState.currentExcerptStart + AppState.snippetLength);
+      }
+      AppState.elapsedSnippetSec = 0;
+      updateTimerUI();
+    }
+
+    function reroll(autoPlay = true) {
+      const card = getCurrentCard();
+      if (!card) return;
+
+      const cardStart = card.startOffset !== undefined ? card.startOffset : (card.safeBounds ? card.safeBounds[0] : 0);
+      const cardEnd = card.endOffset !== undefined ? card.endOffset : (card.safeBounds ? card.safeBounds[1] : (cardStart + 999999));
+
+      if (AppState.snippetLength === 999 || AppState.orderMode === 'playlist') {
+        AppState.currentExcerptStart = cardStart;
+        AppState.currentExcerptEnd = cardEnd;
+      } else {
+        AppState.currentExcerptStart = calculateRandomStart(card, AppState.snippetLength);
+        AppState.currentExcerptEnd = Math.min(cardEnd, AppState.currentExcerptStart + AppState.snippetLength);
+      }
+      AppState.elapsedSnippetSec = 0;
+      updateTimerUI();
+
+      if (autoPlay || AppState.isPlaying) {
+        if (ytPlayer && ytApiReady && typeof ytPlayer.loadVideoById === 'function') {
+          ytPlayer.loadVideoById({ videoId: card.youtubeId, startSeconds: AppState.currentExcerptStart });
+        } else {
+          AudioEngine.play();
+        }
+      } else {
+        AudioEngine.load(card);
+      }
+      showToast(AppState.snippetLength === 999 || AppState.orderMode === 'playlist' ? `🎵 Full movement from ${formatTime(cardStart)}` : `🎲 Excerpt starting at ${formatTime(AppState.currentExcerptStart)}`);
+    }
+
+    function startCountdown() {
+      stopCountdown();
+      const card = getCurrentCard();
+      const cardStart = card ? (card.startOffset !== undefined ? card.startOffset : 0) : 0;
+      const cardEnd = card ? (card.endOffset !== undefined ? card.endOffset : 999999) : 999999;
+
+      if (AppState.snippetLength === 999 || AppState.orderMode === 'playlist') {
+        AppState.progressInterval = setInterval(() => {
+          let cur = 0, dur = 0;
+          if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
+            cur = ytPlayer.getCurrentTime() || 0;
+            dur = ytPlayer.getDuration() || 0;
+          }
+          const effectiveEnd = Math.min(cardEnd, dur > 0 ? dur : cardEnd);
+          const movementDur = Math.max(1, effectiveEnd - cardStart);
+          const elapsed = Math.max(0, cur - cardStart);
+
+          if (dur > 0) {
+            const pct = Math.min(100, (elapsed / movementDur) * 100);
+            document.getElementById('mini-progress-fill').style.width = `${pct}%`;
+            document.getElementById('remaining-text').textContent = `${formatTime(cur)} / ${formatTime(effectiveEnd)}`;
+          }
+
+          // In combined video, advance when movement finishes
+          if (cur >= effectiveEnd && effectiveEnd < (dur - 2)) {
+            if (AppState.orderMode === 'playlist') {
+              showToast("🎵 Movement complete! Playing next track...");
+              setTimeout(() => nextCard(true), 800);
+            } else {
+              AudioEngine.pause();
+            }
+          }
+        }, 250);
+        return;
+      }
+
+      const total = Math.max(1, AppState.currentExcerptEnd - AppState.currentExcerptStart);
+      AppState.progressInterval = setInterval(() => {
+        AppState.elapsedSnippetSec += 0.25;
+        const pct = Math.min(100, (AppState.elapsedSnippetSec / total) * 100);
+        document.getElementById('mini-progress-fill').style.width = `${pct}%`;
+
+        const rem = Math.max(0, Math.ceil(total - AppState.elapsedSnippetSec));
+        document.getElementById('remaining-text').textContent = `${rem}s`;
+
+        if (AppState.elapsedSnippetSec >= total) {
+          AudioEngine.pause();
+          showToast('🎵 Excerpt finished! Pick key or flip card.');
+        }
+      }, 250);
+    }
+
+    function stopCountdown() {
+      if (AppState.progressInterval) {
+        clearInterval(AppState.progressInterval);
+        AppState.progressInterval = null;
+      }
+    }
+
+    function updateTimerUI() {
+      const card = getCurrentCard();
+      const cardStart = card ? (card.startOffset !== undefined ? card.startOffset : 0) : 0;
+      const cardEnd = card ? (card.endOffset !== undefined ? card.endOffset : 999999) : 999999;
+
+      if (AppState.snippetLength === 999 || AppState.orderMode === 'playlist') {
+        document.getElementById('timer-text').textContent = `Full (${formatTime(cardStart)} → ${cardEnd > 3000 ? 'End' : formatTime(cardEnd)})`;
+        document.getElementById('remaining-text').textContent = `Full`;
+      } else {
+        const s = formatTime(AppState.currentExcerptStart);
+        const e = formatTime(AppState.currentExcerptEnd);
+        document.getElementById('timer-text').textContent = `${s} → ${e}`;
+        document.getElementById('remaining-text').textContent = `${AppState.snippetLength}s`;
+      }
+      document.getElementById('mini-progress-fill').style.width = '0%';
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    /**
+     * KEY NORMALIZATION (Accepts key, abbreviation, catalog number, or form name)
+     */
+    function normalizeKey(str) {
+      return str.toLowerCase()
+        .replace(/prelude|fugue|sonata|partita|suite|concerto|variations|toccata|fantasia|fantasy|and|in|the|no\.?|\&/g, '')
+        .replace(/c-sharp|c sharp/g, 'c#')
+        .replace(/f-sharp|f sharp/g, 'f#')
+        .replace(/a-flat|a flat/g, 'ab')
+        .replace(/b-flat|b flat/g, 'bb')
+        .replace(/e-flat|e flat/g, 'eb')
+        .replace(/\bmaj\b|major/g, 'maj')
+        .replace(/\bmin\b|minor/g, 'min')
+        .replace(/[^a-z0-9#]/g, '')
+        .trim();
+    }
+
+    function checkKeyMatch(input, card) {
+      const normInput = input.toLowerCase().trim();
+      const cleanInput = normInput.replace(/[^a-z0-9#]/g, '');
+
+      // 1. Exception: Goldberg Variations ("except for goldberg variations i can just say goldberg variations")
+      if (card.catalog === 'BWV 988' || (card.title && card.title.toLowerCase().includes('goldberg'))) {
+        if (normInput.includes('goldberg') || normInput.includes('aria') || cleanInput === 'g' || cleanInput === 'gmaj' || cleanInput === 'gmajor') {
+          return true;
+        }
+      }
+
+      // 2. Toccata in D Major
+      if (card.catalog === 'BWV 912' || (card.title && card.title.toLowerCase().includes('toccata'))) {
+        if (normInput.includes('toccata') || cleanInput === 'd' || cleanInput === 'dmaj' || cleanInput === 'dmajor' || cleanInput === '912' || cleanInput === 'bwv912') {
+          return true;
+        }
+      }
+
+      const normCardKey = normalizeKey(card.key);
+      const isMinor = card.key.toLowerCase().includes('minor');
+      const rootLetter = card.key.toLowerCase().split(' ')[0].replace('-sharp', '#').replace('-flat', 'b');
+      const abbrev = isMinor ? `${rootLetter}m` : `${rootLetter}`;
+
+      const hasKey = cleanInput.includes(normCardKey) ||
+                     new RegExp(`\\b${rootLetter}\\s*(min|maj|m)?\\b`).test(normInput) ||
+                     cleanInput === abbrev ||
+                     cleanInput === rootLetter;
+
+      // 3. Major keyboard works with movements (Partitas, Suites, Italian Concerto, Chromatic Fantasia & Fugue)
+      if (card.movement && card.category !== 'WTC II Preludes' && card.category !== 'WTC II Fugues') {
+        const normMovement = card.movement.toLowerCase()
+          .replace(/^[ivx]+\.\s*/, '')
+          .replace(/\s*\(.*\)/, '')
+          .replace(/bourr[eé]e\s*i(&|\+)?\s*ii/i, 'bourree')
+          .trim();
+
+        const movKeyword = normMovement.split(' ')[0];
+        const hasMovement = normInput.includes(movKeyword) ||
+                            (movKeyword.startsWith('bourr') && normInput.includes('bourr')) ||
+                            (movKeyword.startsWith('menuet') && (normInput.includes('menuet') || normInput.includes('minuet')));
+
+        // Must identify movement AND key!
+        if (hasMovement && hasKey) return true;
+
+        return false;
+      }
+
+      // 4. Standard pieces (Scarlatti Sonatas, WTC Preludes & Fugues)
+      if (hasKey) return true;
+
+      // Match catalog number (e.g. "847", "bwv 847", "k96")
+      const catNorm = card.catalog.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (cleanInput === catNorm || (cleanInput.length >= 3 && catNorm.includes(cleanInput))) return true;
+
+      // Match piece title keyword
+      const titleClean = card.title.toLowerCase();
+      if (cleanInput.length >= 4 && titleClean.includes(cleanInput)) return true;
+
+      return false;
+    }
+
+    /**
+     * INTERACTIVE ANSWER LOGIC
+     */
+    function setupAnswerArea() {
+      const card = getCurrentCard();
+      if (!card) return;
+
+      AppState.mcAnswered = false;
+
+      // Update Playlist On-Screen Info
+      document.getElementById('pl-composer').textContent = card.composer;
+      document.getElementById('pl-title').textContent = card.title;
+      document.getElementById('pl-key').textContent = card.key;
+      document.getElementById('pl-catalog').textContent = card.catalog;
+      document.getElementById('pl-notes').textContent = card.notes;
+
+      // Next up preview
+      const nextIdx = (AppState.deckIndex + 1) % AppState.activeDeck.length;
+      const nextCardObj = AppState.repertoire[AppState.activeDeck[nextIdx]];
+      if (nextCardObj) {
+        document.getElementById('pl-nextup').textContent = `Next Up: ${nextCardObj.composer.split(' ').pop()} — ${nextCardObj.title} (${nextCardObj.catalog})`;
+      }
+
+      // Multiple Choice Grid setup: pick 3 distinct distractors
+      const distractors = AppState.repertoire.filter(p => p.id !== card.id);
+      for (let i = distractors.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [distractors[i], distractors[j]] = [distractors[j], distractors[i]];
+      }
+      const opts = [card, ...distractors.slice(0, 3)];
+      for (let i = opts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [opts[i], opts[j]] = [opts[j], opts[i]];
+      }
+
+      const grid = document.getElementById('choices-grid');
+      grid.innerHTML = '';
+      const letters = ['A', 'B', 'C', 'D'];
+
+      opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.setAttribute('data-id', opt.id);
+        btn.setAttribute('data-idx', idx);
+        btn.innerHTML = `
+          <span class="choice-kbd">${letters[idx]}</span>
+          <div class="choice-text">
+            <span class="choice-key">${opt.key}</span>
+            <span class="choice-sub">${opt.title} (${opt.catalog})</span>
+          </div>
+        `;
+        btn.onclick = () => selectChoice(opt.id, btn);
+        grid.appendChild(btn);
+      });
+
+      // Reset Type Key View
+      const inp = document.getElementById('type-key-input');
+      const feed = document.getElementById('type-key-feedback');
+      if (inp) {
+        inp.value = '';
+        if (card.catalog === 'BWV 988' || (card.title && card.title.includes('Goldberg'))) {
+          inp.placeholder = "Type 'Goldberg Variations' (or key) ↵";
+        } else if (card.movement && card.category !== 'WTC II Preludes' && card.category !== 'WTC II Fugues') {
+          inp.placeholder = "Type movement & key (e.g. Sarabande C Minor, Andante Dm) ↵";
+        } else {
+          inp.placeholder = "Type key or piece name (e.g. D Minor, D, C# Maj...) ↵";
+        }
+      }
+      if (feed) feed.style.display = 'none';
+
+      updateAnswerModeViews();
+    }
+
+    function selectChoice(id, btn) {
+      if (AppState.mcAnswered) return;
+      AppState.mcAnswered = true;
+      const card = getCurrentCard();
+      const isCorrect = (id === card.id);
+
+      document.querySelectorAll('.choice-btn').forEach(b => {
+        b.disabled = true;
+        if (b.getAttribute('data-id') === card.id) b.classList.add('correct');
+        else if (b === btn && !isCorrect) b.classList.add('wrong');
+      });
+
+      showToast(isCorrect ? "✓ Correct!" : "✕ Incorrect — see highlighted answer");
+      const flipBtn = document.getElementById('btn-flip-front');
+      flipBtn.textContent = isCorrect ? '✓ Correct! Reveal Full Solution (↵)' : '✕ Reveal Full Solution (↵)';
+    }
+
+    function submitTypeKey() {
+      const card = getCurrentCard();
+      if (!card) return;
+      const val = document.getElementById('type-key-input').value.trim();
+      if (!val) return;
+
+      const feed = document.getElementById('type-key-feedback');
+      const feedMsg = document.getElementById('type-key-feedback-msg');
+      feed.style.display = 'flex';
+
+      if (checkKeyMatch(val, card)) {
+        feed.className = 'type-key-feedback correct';
+        feedMsg.innerHTML = `✓ <strong>Correct!</strong> ${card.title} in ${card.key} (${card.catalog})`;
+        showToast("✓ Correct!");
+      } else {
+        feed.className = 'type-key-feedback wrong';
+        if (card.movement && card.category !== 'WTC II Preludes' && card.category !== 'WTC II Fugues') {
+          feedMsg.innerHTML = `✕ <strong>Actual:</strong> ${card.movement} in ${card.key} — ${card.work || card.title}`;
+        } else {
+          feedMsg.innerHTML = `✕ <strong>Actual:</strong> ${card.title} in ${card.key} (${card.catalog})`;
+        }
+        showToast("✕ Incorrect");
+      }
+      document.getElementById('btn-type-flip-action').onclick = () => flipTo('back');
+    }
+
+    function updateAnswerModeViews() {
+      const isPlaylist = (AppState.orderMode === 'playlist');
+      document.getElementById('playlist-info-box').style.display = isPlaylist ? 'flex' : 'none';
+      document.getElementById('quiz-answer-box').style.display = isPlaylist ? 'none' : 'flex';
+      document.getElementById('answer-mode-segment').style.display = isPlaylist ? 'none' : 'flex';
+      document.getElementById('playlist-auto-indicator').style.display = isPlaylist ? 'inline-flex' : 'none';
+
+      if (isPlaylist) return;
+
+      const isMC = AppState.answerMode === 'mc';
+      const isType = AppState.answerMode === 'type';
+      const isSelf = AppState.answerMode === 'self';
+
+      document.getElementById('btn-ans-mc').classList.toggle('active', isMC);
+      document.getElementById('btn-ans-type').classList.toggle('active', isType);
+      document.getElementById('btn-ans-self').classList.toggle('active', isSelf);
+
+      document.getElementById('choices-grid').style.display = isMC ? 'grid' : 'none';
+      document.getElementById('type-key-view').style.display = isType ? 'flex' : 'none';
+      document.getElementById('btn-flip-front').style.display = isSelf ? 'inline-flex' : 'inline-flex';
+
+      if (isType) {
+        const currentCard = getCurrentCard();
+        const inp = document.getElementById('type-key-input');
+        if (inp && currentCard) {
+          if (currentCard.catalog === 'BWV 988' || (currentCard.title && currentCard.title.includes('Goldberg'))) {
+            inp.placeholder = "Type 'Goldberg Variations' (or key) ↵";
+          } else if (currentCard.movement && currentCard.category !== 'WTC II Preludes' && currentCard.category !== 'WTC II Fugues') {
+            inp.placeholder = "Type movement & key (e.g. Sarabande C Minor, Andante Dm) ↵";
+          } else {
+            inp.placeholder = "Type key (e.g. D Minor, D, C# Maj...) ↵";
+          }
+        }
+        setTimeout(() => {
+          if (inp) inp.focus();
+        }, 80);
+      }
+    }
+
+    /**
+     * DECK SWITCHING & RENDERING
+     */
+    function switchDeck(deckId) {
+      if (!DECKS[deckId]) return;
+      AudioEngine.stop();
+      hideVideoDrawer();
+
+      AppState.deckId = deckId;
+      AppState.repertoire = DECKS[deckId].items;
+      AppState.composerFilter = 'all';
+
+      // Update Filter dropdown options
+      const filterSelect = document.getElementById('composer-select');
+      filterSelect.innerHTML = '';
+      DECKS[deckId].filterOptions.forEach(opt => {
+        const optEl = document.createElement('option');
+        optEl.value = opt.value;
+        optEl.textContent = opt.label;
+        filterSelect.appendChild(optEl);
+      });
+
+      // Switch Anki persistent engine
+      AnkiEngine.init(deckId);
+
+      document.getElementById('deck-select').value = deckId;
+      showToast(`Switched to ${DECKS[deckId].name}`);
+      buildDeck();
+    }
+
+    function buildDeck() {
+      let indices = [];
+
+      if (AppState.orderMode === 'anki') {
+        indices = AnkiEngine.buildQueue();
+      } else if (AppState.orderMode === 'shuffle') {
+        // Shuffle mode: randomize all items
+        indices = AppState.repertoire.map((_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+      } else {
+        // 'order' or 'playlist': canonical movement order (0, 1, 2, 3...)
+        indices = AppState.repertoire.map((_, i) => i);
+      }
+
+      if (AppState.composerFilter !== 'all') {
+        indices = indices.filter(i => {
+          const item = AppState.repertoire[i];
+          const f = AppState.composerFilter;
+          return item.composer.includes(f) || 
+                 (item.category && item.category === f) ||
+                 (item.type && item.type === f) ||
+                 (item.work && item.work.includes(f)) ||
+                 (item.title && item.title.includes(f));
+        });
+
+        // When filtered to a work or suite and not in shuffle mode, guarantee natural movement sequence
+        if (AppState.orderMode !== 'shuffle') {
+          indices.sort((a, b) => a - b);
+        }
+      }
+
+      AppState.activeDeck = indices;
+      AppState.deckIndex = 0;
+      renderCard();
+    }
+
+    function getCurrentCard() {
+      if (AppState.activeDeck.length === 0) return null;
+      return AppState.repertoire[AppState.activeDeck[AppState.deckIndex]];
+    }
+
+    function renderCard() {
+      const card = getCurrentCard();
+      if (!card) return;
+
+      const total = AppState.activeDeck.length;
+      document.getElementById('card-num-curr').textContent = total === 0 ? 0 : AppState.deckIndex + 1;
+      document.getElementById('card-num-total').textContent = total;
+
+      // SRS Badge
+      const srs = AnkiEngine.getCard(card.id);
+      const srsBadge = document.getElementById('card-srs-badge');
+      if (AppState.orderMode === 'playlist') {
+        srsBadge.className = 'card-srs-pill playlist';
+        srsBadge.textContent = 'PLAYLIST';
+      } else {
+        srsBadge.className = `card-srs-pill ${srs.state}`;
+        srsBadge.textContent = srs.state.toUpperCase();
+      }
+
+      // Back elements
+      document.getElementById('back-composer').textContent = card.composer;
+      document.getElementById('back-title').textContent = card.title;
+      document.getElementById('back-key').textContent = card.key;
+      document.getElementById('back-catalog').textContent = card.catalog;
+      document.getElementById('back-notes').textContent = card.notes;
+      document.getElementById('back-srs-info').textContent = srs.interval === 0 ? '0d (New)' : `${srs.interval}d (${Math.round(srs.easeFactor * 100)}%)`;
+
+      // Anki Grade labels
+      const intervals = AnkiEngine.getIntervals(card.id);
+      document.getElementById('lbl-grade-again').textContent = intervals.again;
+      document.getElementById('lbl-grade-hard').textContent = intervals.hard;
+      document.getElementById('lbl-grade-good').textContent = intervals.good;
+      document.getElementById('lbl-grade-easy').textContent = intervals.easy;
+
+      document.getElementById('back-yt-link').href = `https://www.youtube.com/watch?v=${card.youtubeId}&t=${AppState.currentExcerptStart}s`;
+
+      setupTimestamps();
+      setupAnswerArea();
+      AudioEngine.load(card);
+    }
+
+    function nextCard(autoPlay = false) {
+      if (AppState.activeDeck.length === 0) return;
+      AudioEngine.stop();
+      hideVideoDrawer();
+      if (AppState.deckIndex < AppState.activeDeck.length - 1) {
+        AppState.deckIndex++;
+      } else {
+        if (AppState.orderMode === 'anki' || AppState.orderMode === 'playlist') buildDeck();
+        else AppState.deckIndex = 0;
+        showToast("🎉 Shuffled deck cycled!");
+      }
+      flipTo('front');
+      renderCard();
+      if (autoPlay || AppState.orderMode === 'playlist') {
+        setTimeout(() => AudioEngine.play(), 250);
+      }
+    }
+
+    function prevCard() {
+      if (AppState.activeDeck.length === 0) return;
+      AudioEngine.stop();
+      hideVideoDrawer();
+      AppState.deckIndex = AppState.deckIndex > 0 ? AppState.deckIndex - 1 : AppState.activeDeck.length - 1;
+      flipTo('front');
+      renderCard();
+      if (AppState.orderMode === 'playlist') {
+        setTimeout(() => AudioEngine.play(), 250);
+      }
+    }
+
+    function flipCard() {
+      flipTo(AppState.isFlipped ? 'front' : 'back');
+    }
+
+    function flipTo(face) {
+      AppState.isFlipped = (face === 'back');
+      document.getElementById('flashcard-container').classList.toggle('flipped', AppState.isFlipped);
+      if (!AppState.isFlipped) {
+        hideVideoDrawer();
+        document.getElementById('btn-flip-front').textContent = 'Reveal Solution (F / Enter)';
+      }
+    }
+
+    function gradeCard(grade) {
+      const card = getCurrentCard();
+      if (!card) return;
+      AnkiEngine.rate(card.id, grade);
+      const names = { 1: "Again (Re-queued)", 2: "Hard", 3: "Good", 4: "Easy" };
+      showToast(`Rated: ${names[grade]}`);
+      nextCard();
+    }
+
+    function updatePlayIcon(isPlaying) {
+      document.getElementById('play-icon').style.display = isPlaying ? 'none' : 'block';
+      document.getElementById('pause-icon').style.display = isPlaying ? 'block' : 'none';
+      document.getElementById('btn-play-front').classList.toggle('playing', isPlaying);
+    }
+
+    function toggleVideoDrawer() {
+      const drawer = document.getElementById('video-drawer');
+      const frame = document.getElementById('video-drawer-frame');
+      const card = getCurrentCard();
+      if (drawer.classList.contains('open')) {
+        hideVideoDrawer();
+      } else {
+        AudioEngine.pause();
+        drawer.classList.add('open');
+        frame.src = `https://www.youtube.com/embed/${card.youtubeId}?autoplay=1&controls=1&start=${AppState.currentExcerptStart}`;
+        document.getElementById('btn-toggle-video').textContent = '✕ Video';
+      }
+    }
+
+    function hideVideoDrawer() {
+      const drawer = document.getElementById('video-drawer');
+      const frame = document.getElementById('video-drawer-frame');
+      drawer.classList.remove('open');
+      frame.src = 'about:blank';
+      document.getElementById('btn-toggle-video').textContent = '👁 Video';
+    }
+
+    function setOrderMode(mode) {
+      AppState.orderMode = mode;
+      const orderBtn = document.getElementById('btn-mode-order');
+      if (orderBtn) orderBtn.classList.toggle('active', mode === 'order');
+      document.getElementById('btn-mode-anki').classList.toggle('active', mode === 'anki');
+      document.getElementById('btn-mode-shuffle').classList.toggle('active', mode === 'shuffle');
+      document.getElementById('btn-mode-playlist').classList.toggle('active', mode === 'playlist');
+
+      if (mode === 'playlist') {
+        AppState.snippetLength = 999;
+        document.getElementById('snippet-select').value = "999";
+        showToast("🎧 Playlist: Playing full movements in sequential order");
+      } else if (mode === 'order') {
+        showToast("📖 In Order: Studying movements in canonical sequence");
+      } else if (mode === 'shuffle') {
+        showToast("🔀 Shuffle Quiz: Randomizing cards");
+      }
+
+      buildDeck();
+
+      if (mode === 'playlist') {
+        setTimeout(() => AudioEngine.play(), 300);
+      }
+    }
+
+    function resetLearningProgress() {
+      const deckName = DECKS[AppState.deckId].name;
+      if (confirm(`Reset Anki repetition intervals and learning history for ${deckName} back to 0?`)) {
+        AnkiEngine.resetAll();
+        buildDeck();
+        showToast(`✓ ${deckName} progress reset.`);
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    /**
+     * EQUALIZER CANVAS
+     */
+    const Visualizer = (function() {
+      const canvas = document.getElementById('wave-canvas');
+      const ctx = canvas.getContext('2d');
+      let anim = null, running = false;
+      const bars = Array.from({ length: 28 }, () => ({ h: 3, th: 3, s: 0.15 + Math.random() * 0.2 }));
+
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const w = canvas.width / 28 - 3;
+        const cy = canvas.height / 2;
+
+        for (let i = 0; i < 28; i++) {
+          const b = bars[i];
+          if (running) {
+            if (Math.abs(b.h - b.th) < 1) b.th = 3 + Math.random() * (canvas.height * 0.75);
+            b.h += (b.th - b.h) * b.s;
+          } else {
+            b.h += (3 - b.h) * 0.2;
+          }
+          const x = i * (w + 3) + 2;
+          const y = cy - b.h / 2;
+          ctx.fillStyle = running ? '#5E6AD2' : 'rgba(255,255,255,0.06)';
+          ctx.fillRect(x, y, w, b.h);
+        }
+        anim = requestAnimationFrame(render);
+      }
+      return {
+        start() { running = true; if (!anim) render(); },
+        stop() { running = false; },
+        init() { render(); }
+      };
+    })();
+
+    function renderSyllabus() {
+      const currentDeckObj = DECKS[AppState.deckId];
+      document.getElementById('modal-syllabus-title').textContent = `📋 ${currentDeckObj.name} Repertoire (${currentDeckObj.items.length} Works)`;
+      const tbody = document.getElementById('syllabus-tbody');
+      tbody.innerHTML = '';
+      currentDeckObj.items.forEach((p, idx) => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid rgba(255,255,255,0.03)';
+        tr.innerHTML = `
+          <td style="padding:0.4rem; color:#A5B4FC; font-family:var(--font-mono);">${idx + 1}</td>
+          <td style="padding:0.4rem;"><strong>${p.composer.split(' ').pop()}</strong></td>
+          <td style="padding:0.4rem;">${p.title} (${p.catalog})</td>
+          <td style="padding:0.4rem; font-family:var(--font-mono);">${p.key}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderStatsModal() {
+      const currentItems = DECKS[AppState.deckId].items;
+      document.getElementById('modal-deck-title').textContent = DECKS[AppState.deckId].name;
+      let total = currentItems.length;
+      let newCount = 0;
+      currentItems.forEach(p => {
+        const item = AnkiEngine.getCard(p.id);
+        if (item.state === 'new') newCount++;
+      });
+      const pct = Math.round(((total - newCount) / total) * 100);
+      document.getElementById('stat-mastery-val').textContent = `${pct}%`;
+      document.getElementById('stat-reviews-val').textContent = AnkiEngine.reviewsToday;
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+      if (id === 'modal-deck') renderSyllabus();
+      if (id === 'modal-stats') renderStatsModal();
+    }
+
+    function closeModals() {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+    }
+
+    function attachEvents() {
+      document.getElementById('btn-play-front').onclick = togglePlay;
+      document.getElementById('btn-reroll-front').onclick = () => {
+        if (AppState.orderMode === 'playlist') {
+          buildDeck();
+          AudioEngine.play();
+          showToast("🔀 Reshuffled playlist");
+        } else {
+          reroll(true);
+        }
+      };
+      document.getElementById('btn-restart-snippet').onclick = () => { AppState.elapsedSnippetSec = 0; AudioEngine.play(); };
+
+      document.getElementById('btn-flip-front').onclick = flipCard;
+      document.getElementById('btn-toggle-video').onclick = toggleVideoDrawer;
+
+      // Anki Grade Buttons
+      document.getElementById('btn-grade-again').onclick = () => gradeCard(1);
+      document.getElementById('btn-grade-hard').onclick = () => gradeCard(2);
+      document.getElementById('btn-grade-good').onclick = () => gradeCard(3);
+      document.getElementById('btn-grade-easy').onclick = () => gradeCard(4);
+
+      document.getElementById('btn-next-card').onclick = () => nextCard(AppState.orderMode === 'playlist');
+      document.getElementById('btn-prev-card').onclick = prevCard;
+      document.getElementById('btn-restart-deck').onclick = () => { buildDeck(); showToast("Order reset to start."); };
+
+      // Deck Selector Switcher
+      document.getElementById('deck-select').onchange = (e) => switchDeck(e.target.value);
+
+      // Study Modes
+      const orderBtn = document.getElementById('btn-mode-order');
+      if (orderBtn) orderBtn.onclick = () => setOrderMode('order');
+      document.getElementById('btn-mode-anki').onclick = () => setOrderMode('anki');
+      document.getElementById('btn-mode-shuffle').onclick = () => setOrderMode('shuffle');
+      document.getElementById('btn-mode-playlist').onclick = () => setOrderMode('playlist');
+
+      // Reset Progress Buttons
+      document.getElementById('btn-reset-progress-header').onclick = resetLearningProgress;
+
+      // Answer Modes
+      document.getElementById('btn-ans-mc').onclick = () => { AppState.answerMode = 'mc'; updateAnswerModeViews(); };
+      document.getElementById('btn-ans-type').onclick = () => { AppState.answerMode = 'type'; updateAnswerModeViews(); };
+      document.getElementById('btn-ans-self').onclick = () => { AppState.answerMode = 'self'; updateAnswerModeViews(); };
+
+      // Type Key Submit
+      document.getElementById('btn-type-key-submit').onclick = submitTypeKey;
+      document.getElementById('type-key-input').onkeydown = (e) => { if (e.key === 'Enter') submitTypeKey(); };
+
+      // Dropdowns
+      document.getElementById('snippet-select').onchange = (e) => {
+        AppState.snippetLength = parseInt(e.target.value, 10);
+        reroll(false);
+      };
+      document.getElementById('composer-select').onchange = (e) => {
+        AppState.composerFilter = e.target.value;
+        buildDeck();
+      };
+
+      // Modals
+      document.getElementById('btn-open-stats').onclick = () => openModal('modal-stats');
+      document.getElementById('btn-close-stats').onclick = closeModals;
+      document.getElementById('btn-close-stats-done').onclick = closeModals;
+      document.getElementById('btn-reset-srs-data').onclick = () => {
+        resetLearningProgress();
+        closeModals();
+      };
+
+      document.getElementById('btn-open-deck').onclick = () => openModal('modal-deck');
+      document.getElementById('btn-close-deck').onclick = closeModals;
+      document.getElementById('btn-close-deck-done').onclick = closeModals;
+
+      document.getElementById('btn-open-help').onclick = () => openModal('modal-help');
+      document.getElementById('btn-close-help').onclick = closeModals;
+      document.getElementById('btn-close-help-done').onclick = closeModals;
+
+      document.querySelectorAll('.modal-overlay').forEach(m => m.onclick = (e) => { if (e.target === m) closeModals(); });
+
+      // Keyboard Shortcuts
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+        if (document.querySelector('.modal-overlay.open')) {
+          if (e.key === 'Escape') closeModals();
+          return;
+        }
+
+        if (AppState.isFlipped) {
+          if (e.key === '1') { e.preventDefault(); gradeCard(1); return; }
+          if (e.key === '2') { e.preventDefault(); gradeCard(2); return; }
+          if (e.key === '3') { e.preventDefault(); gradeCard(3); return; }
+          if (e.key === '4') { e.preventDefault(); gradeCard(4); return; }
+        } else if (AppState.orderMode !== 'playlist' && AppState.answerMode === 'mc' && !AppState.mcAnswered) {
+          const map = { 'KeyA': 0, 'KeyB': 1, 'KeyC': 2, 'KeyD': 3, 'Digit1': 0, 'Digit2': 1, 'Digit3': 2, 'Digit4': 3 };
+          if (map[e.code] !== undefined) {
+            const btn = document.querySelector(`.choice-btn[data-idx="${map[e.code]}"]`);
+            if (btn) { e.preventDefault(); btn.click(); return; }
+          }
+        }
+
+        switch (e.code) {
+          case 'Space':
+            e.preventDefault();
+            togglePlay();
+            break;
+          case 'KeyF':
+          case 'Enter':
+            if (AppState.orderMode !== 'playlist') {
+              e.preventDefault();
+              flipCard();
+            }
+            break;
+          case 'KeyR':
+            e.preventDefault();
+            reroll(true);
+            break;
+          case 'ArrowRight':
+          case 'KeyJ':
+            e.preventDefault();
+            nextCard(AppState.orderMode === 'playlist');
+            break;
+          case 'ArrowLeft':
+          case 'KeyK':
+            e.preventDefault();
+            prevCard();
+            break;
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      switchDeck('deck1');
+      attachEvents();
+      Visualizer.init();
+    });
+  </script>
+</body>
+</html>
