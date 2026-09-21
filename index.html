@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>PianoLit Flashcards — Piano Literature Audio Flashcards</title>
   
   <!-- Inter & JetBrains Mono Fonts -->
@@ -3000,6 +3003,7 @@
      */
     function switchDeck(deckId) {
       if (!DECKS[deckId]) return;
+      try { localStorage.setItem('clavierflash_last_deck', deckId); } catch(e) {}
       AudioEngine.stop();
       hideVideoDrawer();
 
@@ -3438,7 +3442,12 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      switchDeck('deck1');
+      let initialDeck = 'deck1';
+      try {
+        const saved = localStorage.getItem('clavierflash_last_deck');
+        if (saved && DECKS[saved]) initialDeck = saved;
+      } catch(e) {}
+      switchDeck(initialDeck);
       attachEvents();
       Visualizer.init();
     });
