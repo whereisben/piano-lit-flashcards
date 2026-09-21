@@ -1572,10 +1572,10 @@
         key: "F Minor",
         category: "WTC II Preludes",
         type: "Prelude",
-        youtubeId: "HSUmYPny3qI",
+        youtubeId: "AALQdJsF8fM",
         startOffset: 0,
-        endOffset: 135,
-        safeBounds: [0, 135],
+        endOffset: 245,
+        safeBounds: [0, 245],
         notes: "Gallant style 2/4 andante with sighing figures (Seufzer) and early classical sonata phrasing."
       },
       {
@@ -1604,10 +1604,10 @@
         key: "A-flat Major",
         category: "WTC II Preludes",
         type: "Prelude",
-        youtubeId: "NAJa4YCoG0c",
+        youtubeId: "kAyuxiLa6Fg",
         startOffset: 0,
-        endOffset: 175,
-        safeBounds: [0, 175],
+        endOffset: 195,
+        safeBounds: [0, 195],
         notes: "Monumental 3/4 concerto-allegro with rich full-voiced chords and expressive cantabile dialogue."
       },
       {
@@ -1686,10 +1686,10 @@
         key: "F Minor",
         category: "WTC II Fugues",
         type: "Fugue",
-        youtubeId: "HSUmYPny3qI",
-        startOffset: 136,
-        endOffset: 260,
-        safeBounds: [136, 260],
+        youtubeId: "H91J9J-ntWo",
+        startOffset: 0,
+        endOffset: 118,
+        safeBounds: [0, 118],
         notes: "3 voices with expressive suspensions and poignant chromaticism."
       },
       {
@@ -1718,10 +1718,10 @@
         key: "A-flat Major",
         category: "WTC II Fugues",
         type: "Fugue",
-        youtubeId: "NAJa4YCoG0c",
-        startOffset: 176,
-        endOffset: 310,
-        safeBounds: [176, 310],
+        youtubeId: "STA4pGC-k28",
+        startOffset: 0,
+        endOffset: 145,
+        safeBounds: [0, 145],
         notes: "Majestic 4-voice double fugue featuring a chromatic second subject."
       },
       {
@@ -2712,47 +2712,75 @@
     /**
      * KEY NORMALIZATION (Accepts key, abbreviation, catalog number, or form name)
      */
-    function normalizeKey(str) {
+    function normalizePitch(str) {
       return str.toLowerCase()
+        .replace(/([a-g])\s*-\s*flat\b/g, '$1b')
+        .replace(/([a-g])\s+flat\b/g, '$1b')
+        .replace(/([a-g])\s*-\s*sharp\b/g, '$1#')
+        .replace(/([a-g])\s+sharp\b/g, '$1#')
+        .replace(/\bmajor\b|\bmaj\b/g, 'maj')
+        .replace(/\bminor\b|\bmin\b/g, 'min');
+    }
+
+    function normalizeKey(str) {
+      return normalizePitch(str)
         .replace(/prelude|fugue|sonata|partita|suite|concerto|variations|toccata|fantasia|fantasy|and|in|the|no\.?|\&/g, '')
-        .replace(/c-sharp|c sharp/g, 'c#')
-        .replace(/f-sharp|f sharp/g, 'f#')
-        .replace(/a-flat|a flat/g, 'ab')
-        .replace(/b-flat|b flat/g, 'bb')
-        .replace(/e-flat|e flat/g, 'eb')
-        .replace(/\bmaj\b|major/g, 'maj')
-        .replace(/\bmin\b|minor/g, 'min')
         .replace(/[^a-z0-9#]/g, '')
         .trim();
     }
 
     function checkKeyMatch(input, card) {
-      const normInput = input.toLowerCase().trim();
+      const rawInput = input.trim();
+      const normInput = normalizePitch(rawInput);
       const cleanInput = normInput.replace(/[^a-z0-9#]/g, '');
 
       // 1. Exception: Goldberg Variations ("except for goldberg variations i can just say goldberg variations")
       if (card.catalog === 'BWV 988' || (card.title && card.title.toLowerCase().includes('goldberg'))) {
-        if (normInput.includes('goldberg') || normInput.includes('aria') || cleanInput === 'g' || cleanInput === 'gmaj' || cleanInput === 'gmajor') {
+        if (/goldberg|aria|variation/i.test(rawInput) || cleanInput === 'g' || cleanInput === 'gmaj' || cleanInput === '988' || cleanInput === 'bwv988') {
           return true;
         }
       }
 
-      // 2. Toccata in D Major
+      // 2. Exception: Toccata in D Major
       if (card.catalog === 'BWV 912' || (card.title && card.title.toLowerCase().includes('toccata'))) {
-        if (normInput.includes('toccata') || cleanInput === 'd' || cleanInput === 'dmaj' || cleanInput === 'dmajor' || cleanInput === '912' || cleanInput === 'bwv912') {
+        if (/toccata/i.test(rawInput) || cleanInput === 'd' || cleanInput === 'dmaj' || cleanInput === '912' || cleanInput === 'bwv912') {
           return true;
         }
       }
 
-      const normCardKey = normalizeKey(card.key);
-      const isMinor = card.key.toLowerCase().includes('minor');
-      const rootLetter = card.key.toLowerCase().split(' ')[0].replace('-sharp', '#').replace('-flat', 'b');
-      const abbrev = isMinor ? `${rootLetter}m` : `${rootLetter}`;
+      // Match catalog number (e.g. "881", "bwv 881", "886", "bwv 886", "k96")
+      const catNorm = card.catalog.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (cleanInput === catNorm || (cleanInput.length >= 3 && catNorm.includes(cleanInput))) {
+        return true;
+      }
 
-      const hasKey = cleanInput.includes(normCardKey) ||
-                     new RegExp(`\\b${rootLetter}\\s*(min|maj|m)?\\b`).test(normInput) ||
-                     cleanInput === abbrev ||
-                     cleanInput === rootLetter;
+      // Card Key Decomposition
+      const normCardKey = normalizePitch(card.key);
+      const isMinor = card.key.toLowerCase().includes('minor');
+      const rootPitchMatch = normCardKey.match(/[a-g][b#]?/);
+      const rootPitch = rootPitchMatch ? rootPitchMatch[0] : '';
+      const abbrev = isMinor ? (rootPitch + 'm') : rootPitch;
+      const fullKeyClean = normCardKey.replace(/[^a-z0-9#]/g, '');
+
+      // Determine if input matches key
+      let hasKey = false;
+      if (cleanInput === rootPitch || cleanInput === abbrev || cleanInput === fullKeyClean) {
+        hasKey = true;
+      } else if (new RegExp('\\b' + rootPitch.replace('#', '\\#') + '(?:maj|min|m)?\\b').test(normInput)) {
+        hasKey = true;
+      } else if (cleanInput.includes(fullKeyClean) || cleanInput.includes(abbrev)) {
+        hasKey = true;
+      } else if (cleanInput.startsWith(rootPitch) && (cleanInput.includes('maj') || cleanInput.includes('min') || cleanInput.endsWith('m'))) {
+        if (isMinor && (cleanInput.includes('min') || cleanInput.endsWith('m'))) hasKey = true;
+        if (!isMinor && (cleanInput.includes('maj') || (!cleanInput.includes('min') && !cleanInput.endsWith('m')))) hasKey = true;
+      }
+
+      // Raw key match (e.g. "a flat", "f minor", "a-flat major")
+      const rawKeyClean = card.key.toLowerCase().replace(/[^a-z]/g, '');
+      const rawInputClean = rawInput.toLowerCase().replace(/[^a-z]/g, '');
+      if (rawInputClean.includes(rawKeyClean)) {
+        hasKey = true;
+      }
 
       // 3. Major keyboard works with movements (Partitas, Suites, Italian Concerto, Chromatic Fantasia & Fugue)
       if (card.movement && card.category !== 'WTC II Preludes' && card.category !== 'WTC II Fugues') {
@@ -2776,13 +2804,9 @@
       // 4. Standard pieces (Scarlatti Sonatas, WTC Preludes & Fugues)
       if (hasKey) return true;
 
-      // Match catalog number (e.g. "847", "bwv 847", "k96")
-      const catNorm = card.catalog.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (cleanInput === catNorm || (cleanInput.length >= 3 && catNorm.includes(cleanInput))) return true;
-
-      // Match piece title keyword
+      // Match piece title keyword (e.g. "prelude in f minor", "prelude in a flat")
       const titleClean = card.title.toLowerCase();
-      if (cleanInput.length >= 4 && titleClean.includes(cleanInput)) return true;
+      if (rawInput.length >= 5 && titleClean.includes(rawInput.toLowerCase())) return true;
 
       return false;
     }
