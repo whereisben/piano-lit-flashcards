@@ -2483,27 +2483,39 @@
         let pState = -1;
         try { pState = ytPlayer.getPlayerState ? ytPlayer.getPlayerState() : -1; } catch(e) {}
         const isVideoEnded = (pState === YT.PlayerState.ENDED);
+        const isSnippetFinished = (AppState.elapsedSnippetSec >= total);
 
-        // Auto restart from start of excerpt if at the end
-        if (AppState.elapsedSnippetSec >= total || isVideoEnded) {
+        let curUrl = "";
+        try { curUrl = ytPlayer.getVideoUrl ? ytPlayer.getVideoUrl() : ""; } catch(e) {}
+        const isSameVideo = curUrl && curUrl.includes(card.youtubeId);
+
+        // Only auto restart from beginning if snippet or video reached the very end
+        if (isSnippetFinished || isVideoEnded) {
           AppState.elapsedSnippetSec = 0;
           updateTimerUI();
+          if (isSameVideo && typeof ytPlayer.seekTo === 'function') {
+            ytPlayer.seekTo(AppState.currentExcerptStart, true);
+          }
         }
-
-        const target = Math.floor(AppState.currentExcerptStart + AppState.elapsedSnippetSec);
 
         try {
           ytPlayer.unMute();
           ytPlayer.setVolume(100);
 
-          let curUrl = "";
-          try { curUrl = ytPlayer.getVideoUrl ? ytPlayer.getVideoUrl() : ""; } catch(e) {}
-
-          if (!curUrl || !curUrl.includes(card.youtubeId) || pState === -1 || pState === 5 || pState === 0) {
+          // CASE 1: Currently paused on this exact video and not at the end -> RESUME IN PLACE!
+          if (isSameVideo && pState === YT.PlayerState.PAUSED && !isSnippetFinished && !isVideoEnded) {
+            ytPlayer.playVideo();
+          }
+          // CASE 2: Different video or unstarted player -> Load at target
+          else if (!isSameVideo || pState === -1 || pState === 5 || pState === 0) {
+            const target = Math.floor(AppState.currentExcerptStart + AppState.elapsedSnippetSec);
             ytPlayer.loadVideoById({ videoId: card.youtubeId, startSeconds: target });
-          } else {
+          }
+          // CASE 3: Standard playback/seek if needed
+          else {
+            const target = Math.floor(AppState.currentExcerptStart + AppState.elapsedSnippetSec);
             const curTime = ytPlayer.getCurrentTime ? ytPlayer.getCurrentTime() : 0;
-            if (Math.abs(curTime - target) > 1.5 || AppState.elapsedSnippetSec === 0) {
+            if (Math.abs(curTime - target) > 2) {
               ytPlayer.seekTo(target, true);
             }
             ytPlayer.playVideo();
@@ -2516,7 +2528,7 @@
         } catch(err) {
           console.error("AudioEngine play error:", err);
           try {
-            ytPlayer.loadVideoById({ videoId: card.youtubeId, startSeconds: target });
+            ytPlayer.playVideo();
           } catch(e2) {}
         }
       },
