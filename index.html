@@ -2780,6 +2780,27 @@
         }
       }
 
+      // 3. Exception: Italian Concerto ("i dont need to identify movements for italian concert or chromatic fantasia")
+      if (card.catalog === 'BWV 971' || card.category === 'Italian Concerto' || (card.title && /italian\s*concerto/i.test(card.title))) {
+        if (/italian|concerto/i.test(rawInput) || cleanInput === '971' || cleanInput === 'bwv971' || /allegro|andante|presto/i.test(rawInput)) {
+          return true;
+        }
+        if (cleanInput === 'f' || cleanInput === 'fmaj' || cleanInput === 'fmajor' || 
+            (card.key.toLowerCase().includes('minor') && (cleanInput === 'd' || cleanInput === 'dm' || cleanInput === 'dmin' || cleanInput === 'dminor'))) {
+          return true;
+        }
+      }
+
+      // 4. Exception: Chromatic Fantasia & Fugue
+      if (card.catalog === 'BWV 903' || card.category === 'Chromatic Fantasia & Fugue' || (card.title && /chromatic/i.test(card.title))) {
+        if (/chromatic|fantasia|fugue/i.test(rawInput) || cleanInput === '903' || cleanInput === 'bwv903') {
+          return true;
+        }
+        if (cleanInput === 'd' || cleanInput === 'dm' || cleanInput === 'dmin' || cleanInput === 'dminor') {
+          return true;
+        }
+      }
+
       // Match catalog number (e.g. "881", "bwv 881", "886", "bwv 886", "k96")
       const catNorm = card.catalog.toLowerCase().replace(/[^a-z0-9]/g, '');
       if (cleanInput === catNorm || (cleanInput.length >= 3 && catNorm.includes(cleanInput))) {
@@ -2814,8 +2835,16 @@
         hasKey = true;
       }
 
-      // 3. Major keyboard works with movements (Partitas, Suites, Italian Concerto, Chromatic Fantasia & Fugue)
-      if (card.movement && card.category !== 'WTC II Preludes' && card.category !== 'WTC II Fugues') {
+      // 5. Major keyboard works that REQUIRE identifying movement AND key (Partita No. 2, English Suite No. 2, French Suite No. 6)
+      const requiresMovementAndKey = card.movement && 
+        card.category !== 'WTC II Preludes' && 
+        card.category !== 'WTC II Fugues' && 
+        card.category !== 'Italian Concerto' && 
+        card.category !== 'Chromatic Fantasia & Fugue' && 
+        card.catalog !== 'BWV 971' && 
+        card.catalog !== 'BWV 903';
+
+      if (requiresMovementAndKey) {
         const normMovement = card.movement.toLowerCase()
           .replace(/^[ivx]+\.\s*/, '')
           .replace(/\s*\(.*\)/, '')
@@ -2833,12 +2862,13 @@
         return false;
       }
 
-      // 4. Standard pieces (Scarlatti Sonatas, WTC Preludes & Fugues)
+      // 6. Standard pieces & works where movement is not required (Scarlatti Sonatas, WTC Preludes & Fugues, Italian Concerto, Chromatic Fantasia)
       if (hasKey) return true;
 
       // Match piece title keyword (e.g. "prelude in f minor", "prelude in a flat")
       const titleClean = card.title.toLowerCase();
       if (rawInput.length >= 5 && titleClean.includes(rawInput.toLowerCase())) return true;
+      if (card.work && rawInput.length >= 5 && card.work.toLowerCase().includes(rawInput.toLowerCase())) return true;
 
       return false;
     }
@@ -2867,12 +2897,37 @@
       }
 
       // Multiple Choice Grid setup: pick 3 distinct distractors
-      const distractors = AppState.repertoire.filter(p => p.id !== card.id);
+      const isWorkWithoutMov = (c) => (c.catalog === 'BWV 971' || c.catalog === 'BWV 903' || c.category === 'Italian Concerto' || c.category === 'Chromatic Fantasia & Fugue');
+
+      const distractors = AppState.repertoire.filter(p => {
+        if (p.id === card.id) return false;
+        // Avoid other movements of the same work when movement ID is not required
+        if (isWorkWithoutMov(card) && (p.catalog === card.catalog || p.category === card.category)) {
+          return false;
+        }
+        return true;
+      });
+
       for (let i = distractors.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [distractors[i], distractors[j]] = [distractors[j], distractors[i]];
       }
-      const opts = [card, ...distractors.slice(0, 3)];
+
+      // Deduplicate works without movement requirement among distractors
+      const pickedDistractors = [];
+      const seenCatalogs = new Set();
+      if (isWorkWithoutMov(card)) seenCatalogs.add(card.catalog);
+
+      for (const d of distractors) {
+        if (isWorkWithoutMov(d)) {
+          if (seenCatalogs.has(d.catalog)) continue;
+          seenCatalogs.add(d.catalog);
+        }
+        pickedDistractors.push(d);
+        if (pickedDistractors.length === 3) break;
+      }
+
+      const opts = [card, ...pickedDistractors];
       for (let i = opts.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [opts[i], opts[j]] = [opts[j], opts[i]];
@@ -2887,11 +2942,19 @@
         btn.className = 'choice-btn';
         btn.setAttribute('data-id', opt.id);
         btn.setAttribute('data-idx', idx);
+
+        let subTitle = opt.title;
+        if (opt.catalog === 'BWV 971' || opt.category === 'Italian Concerto') {
+          subTitle = 'Italian Concerto';
+        } else if (opt.catalog === 'BWV 903' || opt.category === 'Chromatic Fantasia & Fugue') {
+          subTitle = 'Chromatic Fantasia & Fugue';
+        }
+
         btn.innerHTML = `
           <span class="choice-kbd">${letters[idx]}</span>
           <div class="choice-text">
             <span class="choice-key">${opt.key}</span>
-            <span class="choice-sub">${opt.title} (${opt.catalog})</span>
+            <span class="choice-sub">${subTitle} (${opt.catalog})</span>
           </div>
         `;
         btn.onclick = () => selectChoice(opt.id, btn);
@@ -2905,8 +2968,12 @@
         inp.value = '';
         if (card.catalog === 'BWV 988' || (card.title && card.title.includes('Goldberg'))) {
           inp.placeholder = "Type 'Goldberg Variations' (or key) ↵";
+        } else if (card.catalog === 'BWV 971' || card.category === 'Italian Concerto') {
+          inp.placeholder = "Type 'Italian Concerto' or key (e.g. F Major, Dm) ↵";
+        } else if (card.catalog === 'BWV 903' || card.category === 'Chromatic Fantasia & Fugue') {
+          inp.placeholder = "Type 'Chromatic Fantasia' or key (D Minor) ↵";
         } else if (card.movement && card.category !== 'WTC II Preludes' && card.category !== 'WTC II Fugues') {
-          inp.placeholder = "Type movement & key (e.g. Sarabande C Minor, Andante Dm) ↵";
+          inp.placeholder = "Type movement & key (e.g. Sarabande C Minor, Allemande E) ↵";
         } else {
           inp.placeholder = "Type key or piece name (e.g. D Minor, D, C# Maj...) ↵";
         }
