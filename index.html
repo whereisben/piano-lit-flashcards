@@ -864,6 +864,7 @@
       <select id="deck-select" class="select-deck" title="Switch Repertoire Deck">
         <option value="deck1">Listening Test 1 (22 Works)</option>
         <option value="deck2">Listening Test 2 (42 Works / Movements)</option>
+        <option value="deck3">Listening Test 3 (35 Works / Movements)</option>
       </select>
     </div>
 
@@ -884,14 +885,11 @@
     <div class="unified-toolbar">
       <div class="tool-segment">
         <span class="segment-label">Mode:</span>
-        <button class="btn btn-pill" id="btn-mode-order" title="Study in canonical syllabus order (1 → 2 → 3...)">
-          📖 In Order
+        <button class="btn btn-pill active" id="btn-mode-anki" title="Anki Spaced Repetition (Reviews due cards & learning queue)">
+          ⚡ Anki SRS
         </button>
         <button class="btn btn-pill" id="btn-mode-shuffle" title="Shuffle through all pieces for randomized quiz testing">
           🔀 Shuffle Quiz
-        </button>
-        <button class="btn btn-pill active" id="btn-mode-anki" title="Anki Spaced Repetition (Reviews due cards & learning queue)">
-          ⚡ Anki SRS
         </button>
         <button class="btn btn-pill" id="btn-mode-playlist" title="Continuous background playlist (plays full movements in sequence from start to end)">
           🎧 Playlist
@@ -900,8 +898,7 @@
 
       <div class="tool-segment" id="answer-mode-segment">
         <span class="segment-label">Answer:</span>
-        <button class="btn btn-pill active" id="btn-ans-mc">🔘 Choice</button>
-        <button class="btn btn-pill" id="btn-ans-type">✍️ Type Key</button>
+        <button class="btn btn-pill active" id="btn-ans-type">✍️ Type Answer</button>
         <button class="btn btn-pill" id="btn-ans-self">👁 Flip</button>
       </div>
 
@@ -985,23 +982,23 @@
 
           <!-- Interactive Answer Area (Quiz Modes) -->
           <div class="interactive-answer-box" id="quiz-answer-box">
-            <!-- 1: Multiple Choice Grid -->
-            <div class="choices-grid" id="choices-grid"></div>
-
-            <!-- 2: Type In Key Form -->
-            <div id="type-key-view" style="display:none; flex-direction:column; gap:0.4rem;">
+            <!-- 1: Type In Key / Movement Form -->
+            <div id="type-key-view" style="display:flex; flex-direction:column; gap:0.4rem; width:100%;">
               <div class="type-key-wrap">
-                <input type="text" class="type-key-input" id="type-key-input" placeholder="Type key or piece name (e.g. D Minor, D, C#, Prelude, Fugue...) ↵" />
+                <input type="text" class="type-key-input" id="type-key-input" placeholder="Type key or piece name (e.g. D Minor, Allegro C Minor, K. 310...) ↵" />
                 <button class="btn btn-primary" id="btn-type-key-submit">Check (↵)</button>
               </div>
               <div class="type-key-feedback" id="type-key-feedback">
                 <span id="type-key-feedback-msg"></span>
                 <button class="btn btn-pill" id="btn-type-flip-action">View Solution →</button>
               </div>
+              <button class="btn btn-pill" id="btn-give-up" style="align-self:center; font-size:0.75rem; color:var(--foreground-muted); margin-top:2px;">
+                Don't know? Reveal Solution (F)
+              </button>
             </div>
 
-            <!-- 3: Self-Check Button -->
-            <button class="btn btn-primary" id="btn-flip-front" style="width:100%; padding:0.65rem;">
+            <!-- 2: Self-Check Button (Flip Mode) -->
+            <button class="btn btn-primary" id="btn-flip-front" style="display:none; width:100%; padding:0.65rem;">
               Reveal Solution (F / Enter)
             </button>
           </div>
@@ -1159,13 +1156,13 @@
       </div>
       <div class="modal-body" style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.8rem;">
         <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem; border-bottom:1px solid var(--border-default);">
-          <span>Play / Pause</span><kbd>Space</kbd>
+          <span>Play / Pause Excerpt</span><kbd>Space</kbd>
         </div>
         <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem; border-bottom:1px solid var(--border-default);">
-          <span>Select Choice</span><div><kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> or <kbd>1</kbd>–<kbd>4</kbd></div>
+          <span>Type Answer / Submit</span><kbd>Enter</kbd>
         </div>
         <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem; border-bottom:1px solid var(--border-default);">
-          <span>Flip Card / Submit</span><kbd>Enter</kbd> or <kbd>F</kbd>
+          <span>Flip Card / Reveal Solution</span><kbd>F</kbd>
         </div>
         <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem; border-bottom:1px solid var(--border-default);">
           <span>Rate Recall (Back)</span><div><kbd>1</kbd> Again <kbd>2</kbd> Hard <kbd>3</kbd> Good <kbd>4</kbd> Easy</div>
@@ -1174,7 +1171,7 @@
           <span>Reroll Excerpt / Shuffle</span><kbd>R</kbd>
         </div>
         <div style="display:flex; justify-content:space-between; padding-bottom:0.25rem;">
-          <span>Next / Prev</span><kbd>→</kbd> / <kbd>←</kbd>
+          <span>Next / Prev Card</span><kbd>→</kbd> / <kbd>←</kbd>
         </div>
       </div>
       <div class="modal-footer">
@@ -2207,6 +2204,601 @@
       }
     ];
 
+    /**
+     * ==========================================================================
+     * REPERTOIRE DECK 3: LISTENING TEST 3 (35 Works / Movements: Haydn & Mozart)
+     * ==========================================================================
+     */
+    const LISTENING_TEST_3 = [
+      // --- JOSEPH HAYDN (10 Movements across 4 Works) ---
+      // 1. Sonata in C Minor, Hob. XVI:20 (3)
+      {
+        id: "haydn-xvi20-1",
+        composer: "Joseph Haydn",
+        work: "Sonata in C Minor, Hob. XVI:20",
+        movement: "I. Moderato",
+        title: "Sonata in C Minor: I. Moderato",
+        catalog: "Hob. XVI:20",
+        key: "C Minor",
+        category: "Hob. XVI:20",
+        type: "Sonata",
+        youtubeId: "wXALt62_XK0",
+        startOffset: 0,
+        endOffset: 563,
+        safeBounds: [0, 563],
+        notes: "Haydn's Sturm und Drang masterpiece: intense, tragic C minor Moderato in 4/4 with syncopations, dramatic pauses, and expressive dynamic contrasts."
+      },
+      {
+        id: "haydn-xvi20-2",
+        composer: "Joseph Haydn",
+        work: "Sonata in C Minor, Hob. XVI:20",
+        movement: "II. Andante con moto",
+        title: "Sonata in C Minor: II. Andante con moto",
+        catalog: "Hob. XVI:20",
+        key: "A-flat Major",
+        category: "Hob. XVI:20",
+        type: "Sonata",
+        youtubeId: "wXALt62_XK0",
+        startOffset: 563,
+        endOffset: 830,
+        safeBounds: [563, 830],
+        notes: "Cantabile lyrical movement in A-flat major in 3/4 with continuous gentle syncopations, delicate ornaments, and profound warmth."
+      },
+      {
+        id: "haydn-xvi20-3",
+        composer: "Joseph Haydn",
+        work: "Sonata in C Minor, Hob. XVI:20",
+        movement: "III. Finale: Allegro",
+        title: "Sonata in C Minor: III. Finale: Allegro",
+        catalog: "Hob. XVI:20",
+        key: "C Minor",
+        category: "Hob. XVI:20",
+        type: "Sonata",
+        youtubeId: "wXALt62_XK0",
+        startOffset: 830,
+        endOffset: 1085,
+        safeBounds: [830, 1085],
+        notes: "Fierce, restless Allegro finale in C minor in 2/4; rapid crossing hands, jagged staccatos, and an uncompromising, dramatic minor conclusion."
+      },
+
+      // 2. Sonata in C Major, Hob. XVI:50 (3)
+      {
+        id: "haydn-xvi50-1",
+        composer: "Joseph Haydn",
+        work: "Sonata in C Major, Hob. XVI:50",
+        movement: "I. Allegro",
+        title: "Sonata in C Major: I. Allegro",
+        catalog: "Hob. XVI:50",
+        key: "C Major",
+        category: "Hob. XVI:50",
+        type: "Sonata",
+        youtubeId: "VijCE-3YvL8",
+        startOffset: 0,
+        endOffset: 504,
+        safeBounds: [0, 504],
+        notes: "English London sonata written for the Broadwood pianoforte; famous staccato motif, 'open pedal' whispering passages, and witty humor."
+      },
+      {
+        id: "haydn-xvi50-2",
+        composer: "Joseph Haydn",
+        work: "Sonata in C Major, Hob. XVI:50",
+        movement: "II. Adagio",
+        title: "Sonata in C Major: II. Adagio",
+        catalog: "Hob. XVI:50",
+        key: "F Major",
+        category: "Hob. XVI:50",
+        type: "Sonata",
+        youtubeId: "VijCE-3YvL8",
+        startOffset: 504,
+        endOffset: 869,
+        safeBounds: [504, 869],
+        notes: "Noble, operatic Italianate Adagio in F major in 3/4 with lavish bel canto coloratura embellishments and rich sonorities."
+      },
+      {
+        id: "haydn-xvi50-3",
+        composer: "Joseph Haydn",
+        work: "Sonata in C Major, Hob. XVI:50",
+        movement: "III. Allegro molto",
+        title: "Sonata in C Major: III. Allegro molto",
+        catalog: "Hob. XVI:50",
+        key: "C Major",
+        category: "Hob. XVI:50",
+        type: "Sonata",
+        youtubeId: "VijCE-3YvL8",
+        startOffset: 869,
+        endOffset: 998,
+        safeBounds: [869, 998],
+        notes: "Sparkling, brief, humorous scherzando finale in 3/4 full of unexpected pauses, off-beat accents, and Haydnesque wit."
+      },
+
+      // 3. Sonata in E-flat Major, Hob. XVI:52 (3)
+      {
+        id: "haydn-xvi52-1",
+        composer: "Joseph Haydn",
+        work: "Sonata in E-flat Major, Hob. XVI:52",
+        movement: "I. Allegro",
+        title: "Sonata in E-flat Major: I. Allegro",
+        catalog: "Hob. XVI:52",
+        key: "E-flat Major",
+        category: "Hob. XVI:52",
+        type: "Sonata",
+        youtubeId: "DDVj_JzQCg8",
+        startOffset: 0,
+        endOffset: 505,
+        safeBounds: [0, 505],
+        notes: "Haydn's grandest keyboard sonata: majestic orchestral French-overture style opening chords in E-flat major, expansive development, and Beethovenian power."
+      },
+      {
+        id: "haydn-xvi52-2",
+        composer: "Joseph Haydn",
+        work: "Sonata in E-flat Major, Hob. XVI:52",
+        movement: "II. Adagio",
+        title: "Sonata in E-flat Major: II. Adagio",
+        catalog: "Hob. XVI:52",
+        key: "E Major",
+        category: "Hob. XVI:52",
+        type: "Sonata",
+        youtubeId: "DDVj_JzQCg8",
+        startOffset: 505,
+        endOffset: 974,
+        safeBounds: [505, 974],
+        notes: "Extraordinary remote tonal shift to E major (remote semitone relationship) with profound, hymn-like dignity and meditative solemnity."
+      },
+      {
+        id: "haydn-xvi52-3",
+        composer: "Joseph Haydn",
+        work: "Sonata in E-flat Major, Hob. XVI:52",
+        movement: "III. Finale: Presto",
+        title: "Sonata in E-flat Major: III. Finale: Presto",
+        catalog: "Hob. XVI:52",
+        key: "E-flat Major",
+        category: "Hob. XVI:52",
+        type: "Sonata",
+        youtubeId: "DDVj_JzQCg8",
+        startOffset: 974,
+        endOffset: 1288,
+        safeBounds: [974, 1288],
+        notes: "Exhilarating, breathtaking Presto finale in 2/4 with repeated notes, sudden harmonic shifts, and dazzling keyboard virtuosity."
+      },
+
+      // 4. Andante con variazioni in F Minor, Hob. XVII:6 (1)
+      {
+        id: "haydn-xvii6",
+        composer: "Joseph Haydn",
+        work: "Andante con variazioni, Hob. XVII:6",
+        movement: "Theme & Variations",
+        title: "Andante con variazioni in F Minor",
+        catalog: "Hob. XVII:6",
+        key: "F Minor",
+        category: "Hob. XVII:6",
+        type: "Variations",
+        youtubeId: "MGDuDvFxdeI",
+        startOffset: 0,
+        endOffset: 810,
+        safeBounds: [0, 810],
+        notes: "Haydn's greatest independent keyboard work: double variation form alternating mournful F minor theme and radiant F major theme, concluding with an astonishing, tragic coda."
+      },
+
+      // --- WOLFGANG AMADEUS MOZART (25 Movements across 9 Works) ---
+      // 5. Sonata in A Minor, K. 310 (3)
+      {
+        id: "mozart-k310-1",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in A Minor, K. 310",
+        movement: "I. Allegro maestoso",
+        title: "Sonata in A Minor: I. Allegro maestoso",
+        catalog: "K. 310",
+        key: "A Minor",
+        category: "K. 310",
+        type: "Sonata",
+        youtubeId: "ZKs1WpMJ0X8",
+        startOffset: 0,
+        endOffset: 513,
+        safeBounds: [0, 513],
+        notes: "Written in Paris following his mother's death: tragic, impassioned Allegro maestoso with throbbing repeated eighth-note chords and dramatic anguish."
+      },
+      {
+        id: "mozart-k310-2",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in A Minor, K. 310",
+        movement: "II. Andante cantabile con espressione",
+        title: "Sonata in A Minor: II. Andante cantabile",
+        catalog: "K. 310",
+        key: "F Major",
+        category: "K. 310",
+        type: "Sonata",
+        youtubeId: "ZKs1WpMJ0X8",
+        startOffset: 513,
+        endOffset: 1149,
+        safeBounds: [513, 1149],
+        notes: "Lyrical, singing F major Andante cantabile interrupted in the development by a stormy, turbulent dramatic outburst."
+      },
+      {
+        id: "mozart-k310-3",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in A Minor, K. 310",
+        movement: "III. Presto",
+        title: "Sonata in A Minor: III. Presto",
+        catalog: "K. 310",
+        key: "A Minor",
+        category: "K. 310",
+        type: "Sonata",
+        youtubeId: "ZKs1WpMJ0X8",
+        startOffset: 1149,
+        endOffset: 1348,
+        safeBounds: [1149, 1348],
+        notes: "Breathless, ghostly rondo-presto in 2/4 with incessant sixteenth notes, unresolved tension, and dark despair."
+      },
+
+      // 6. Sonata in D Major, K. 311 (3)
+      {
+        id: "mozart-k311-1",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in D Major, K. 311",
+        movement: "I. Allegro con spirito",
+        title: "Sonata in D Major: I. Allegro con spirito",
+        catalog: "K. 311",
+        key: "D Major",
+        category: "K. 311",
+        type: "Sonata",
+        youtubeId: "SZ5Jw6KNP3M",
+        startOffset: 0,
+        endOffset: 259,
+        safeBounds: [0, 259],
+        notes: "Mannheim-influenced brilliant sonata with orchestral texture; famous reversed recapitulation (second theme returns first)."
+      },
+      {
+        id: "mozart-k311-2",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in D Major, K. 311",
+        movement: "II. Andante con espressione",
+        title: "Sonata in D Major: II. Andante con espressione",
+        catalog: "K. 311",
+        key: "G Major",
+        category: "K. 311",
+        type: "Sonata",
+        youtubeId: "SZ5Jw6KNP3M",
+        startOffset: 259,
+        endOffset: 553,
+        safeBounds: [259, 553],
+        notes: "Sweet, aria-like episodic slow movement in G major in 2/4 with delicate embellishments and vocal charm."
+      },
+      {
+        id: "mozart-k311-3",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in D Major, K. 311",
+        movement: "III. Rondeau: Allegro",
+        title: "Sonata in D Major: III. Rondeau: Allegro",
+        catalog: "K. 311",
+        key: "D Major",
+        category: "K. 311",
+        type: "Sonata",
+        youtubeId: "SZ5Jw6KNP3M",
+        startOffset: 553,
+        endOffset: 909,
+        safeBounds: [553, 909],
+        notes: "Concertante-style sparkling 6/8 rondo featuring an unexpected cadenza-like adagio/presto interpolation before the final rush."
+      },
+
+      // 7. Sonata in A Major, K. 331 (3)
+      {
+        id: "mozart-k331-1",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in A Major, K. 331",
+        movement: "I. Andante grazioso",
+        title: "Sonata in A Major: I. Andante grazioso",
+        catalog: "K. 331",
+        key: "A Major",
+        category: "K. 331",
+        type: "Sonata",
+        youtubeId: "6GezrRPNRrw",
+        startOffset: 0,
+        endOffset: 830,
+        safeBounds: [0, 830],
+        notes: "Unusual opening: elegant 6/8 siciliana theme followed by 6 character variations, including an expressive Adagio variation V and Allegro variation VI."
+      },
+      {
+        id: "mozart-k331-2",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in A Major, K. 331",
+        movement: "II. Menuetto & Trio",
+        title: "Sonata in A Major: II. Menuetto & Trio",
+        catalog: "K. 331",
+        key: "A Major",
+        category: "K. 331",
+        type: "Sonata",
+        youtubeId: "6GezrRPNRrw",
+        startOffset: 830,
+        endOffset: 1229,
+        safeBounds: [830, 1229],
+        notes: "Aristocratic, poised minuet in A major paired with an intimate, pastoral Trio in D major in 3/4."
+      },
+      {
+        id: "mozart-k331-3",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in A Major, K. 331",
+        movement: "III. Alla Turca: Allegretto",
+        title: "Sonata in A Major: III. Alla Turca: Allegretto",
+        catalog: "K. 331",
+        key: "A Minor",
+        category: "K. 331",
+        type: "Sonata",
+        youtubeId: "6GezrRPNRrw",
+        startOffset: 1229,
+        endOffset: 1448,
+        safeBounds: [1229, 1448],
+        notes: "The world-famous 'Turkish March' in 2/4 imitating Janissary percussion bands with rapid 16ths, rollicking octaves, and triumphant A major refrains."
+      },
+
+      // 8. Sonata in B-flat Major, K. 333 (3)
+      {
+        id: "mozart-k333-1",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in B-flat Major, K. 333",
+        movement: "I. Allegro",
+        title: "Sonata in B-flat Major: I. Allegro",
+        catalog: "K. 333",
+        key: "B-flat Major",
+        category: "K. 333",
+        type: "Sonata",
+        youtubeId: "6UeMTSHvGUA",
+        startOffset: 0,
+        endOffset: 418,
+        safeBounds: [0, 418],
+        notes: "Lyrical, singing allegro in 4/4 with elegant galant opening phrase starting on the upbeat; rich, polyphonic texture."
+      },
+      {
+        id: "mozart-k333-2",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in B-flat Major, K. 333",
+        movement: "II. Andante cantabile",
+        title: "Sonata in B-flat Major: II. Andante cantabile",
+        catalog: "K. 333",
+        key: "E-flat Major",
+        category: "K. 333",
+        type: "Sonata",
+        youtubeId: "6UeMTSHvGUA",
+        startOffset: 418,
+        endOffset: 865,
+        safeBounds: [418, 865],
+        notes: "Soulful, deeply expressive Andante cantabile in E-flat major in 3/4 with chromatic dissonances and poignant suspensions."
+      },
+      {
+        id: "mozart-k333-3",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in B-flat Major, K. 333",
+        movement: "III. Allegretto grazioso",
+        title: "Sonata in B-flat Major: III. Allegretto grazioso",
+        catalog: "K. 333",
+        key: "B-flat Major",
+        category: "K. 333",
+        type: "Sonata",
+        youtubeId: "6UeMTSHvGUA",
+        startOffset: 865,
+        endOffset: 1231,
+        safeBounds: [865, 1231],
+        notes: "Grand concertante rondo finale featuring an extensive, virtuosic solo cadenza (rare in solo piano sonatas) evoking a piano concerto."
+      },
+
+      // 9. Sonata in C Minor, K. 457 (3)
+      {
+        id: "mozart-k457-1",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in C Minor, K. 457",
+        movement: "I. Molto allegro",
+        title: "Sonata in C Minor: I. Molto allegro",
+        catalog: "K. 457",
+        key: "C Minor",
+        category: "K. 457",
+        type: "Sonata",
+        youtubeId: "hKHfRV19hw8",
+        startOffset: 0,
+        endOffset: 318,
+        safeBounds: [0, 318],
+        notes: "Dramatic C minor sonata (often paired with Fantasy K. 475): powerful unison arpeggio opening answered by plaintive sighs; anticipating Beethoven's Pathétique."
+      },
+      {
+        id: "mozart-k457-2",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in C Minor, K. 457",
+        movement: "II. Adagio",
+        title: "Sonata in C Minor: II. Adagio",
+        catalog: "K. 457",
+        key: "E-flat Major",
+        category: "K. 457",
+        type: "Sonata",
+        youtubeId: "hKHfRV19hw8",
+        startOffset: 318,
+        endOffset: 807,
+        safeBounds: [318, 807],
+        notes: "Sublime, hymn-like Adagio in E-flat major in 4/4 with sublime lyrical ornamentation, anticipating Beethoven's Op. 13 Adagio."
+      },
+      {
+        id: "mozart-k457-3",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in C Minor, K. 457",
+        movement: "III. Allegro assai",
+        title: "Sonata in C Minor: III. Allegro assai",
+        catalog: "K. 457",
+        key: "C Minor",
+        category: "K. 457",
+        type: "Sonata",
+        youtubeId: "hKHfRV19hw8",
+        startOffset: 807,
+        endOffset: 1065,
+        safeBounds: [807, 1065],
+        notes: "Restless, breathless 3/4 finale with syncopated gasps, dramatic pauses, and a grim, shadowy conclusion in C minor."
+      },
+
+      // 10. Sonata in D Major, K. 576 (3)
+      {
+        id: "mozart-k576-1",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in D Major, K. 576",
+        movement: "I. Allegro",
+        title: "Sonata in D Major: I. Allegro",
+        catalog: "K. 576",
+        key: "D Major",
+        category: "K. 576",
+        type: "Sonata",
+        youtubeId: "jBlMh247Iho",
+        startOffset: 0,
+        endOffset: 308,
+        safeBounds: [0, 308],
+        notes: "Mozart's final piano sonata ('The Hunt' or 'Trumpet'): brisk 6/8 hunting-horn opening fanfare followed by brilliant contrapuntal imitation."
+      },
+      {
+        id: "mozart-k576-2",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in D Major, K. 576",
+        movement: "II. Adagio",
+        title: "Sonata in D Major: II. Adagio",
+        catalog: "K. 576",
+        key: "A Major",
+        category: "K. 576",
+        type: "Sonata",
+        youtubeId: "jBlMh247Iho",
+        startOffset: 308,
+        endOffset: 625,
+        safeBounds: [308, 625],
+        notes: "Serene, luminous Adagio in A major in 2/4 with a poignant, wandering minor middle section in F-sharp minor."
+      },
+      {
+        id: "mozart-k576-3",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Sonata in D Major, K. 576",
+        movement: "III. Allegretto",
+        title: "Sonata in D Major: III. Allegretto",
+        catalog: "K. 576",
+        key: "D Major",
+        category: "K. 576",
+        type: "Sonata",
+        youtubeId: "jBlMh247Iho",
+        startOffset: 625,
+        endOffset: 886,
+        safeBounds: [625, 886],
+        notes: "Contrapuntally intricate sonata-rondo in 2/4 with sparkling running passagework, arpeggios, and effortless mastery."
+      },
+
+      // 11. Rondo in A Minor, K. 511 (1)
+      {
+        id: "mozart-k511",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Rondo in A Minor, K. 511",
+        movement: "Andante",
+        title: "Rondo in A Minor",
+        catalog: "K. 511",
+        key: "A Minor",
+        category: "K. 511",
+        type: "Rondo",
+        youtubeId: "G7N6L9v007w",
+        startOffset: 0,
+        endOffset: 610,
+        safeBounds: [0, 610],
+        notes: "One of Mozart's most poignant standalone works: a melancholy 6/8 siciliana lilt with chromatic ornamentation and profound heartbreak."
+      },
+
+      // 12. Piano Concerto in D Minor, K. 466 (3)
+      {
+        id: "mozart-k466-1",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Piano Concerto in D Minor, K. 466",
+        movement: "I. Allegro",
+        title: "Piano Concerto in D Minor: I. Allegro",
+        catalog: "K. 466",
+        key: "D Minor",
+        category: "K. 466",
+        type: "Concerto",
+        youtubeId: "O0Hys66rpMI",
+        startOffset: 0,
+        endOffset: 928,
+        safeBounds: [0, 928],
+        notes: "Stormy, brooding D minor opening with syncopated string murmurs and explosive orchestral tuttis; solo piano enters with a poignant, melancholy new theme."
+      },
+      {
+        id: "mozart-k466-2",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Piano Concerto in D Minor, K. 466",
+        movement: "II. Romance",
+        title: "Piano Concerto in D Minor: II. Romance",
+        catalog: "K. 466",
+        key: "B-flat Major",
+        category: "K. 466",
+        type: "Concerto",
+        youtubeId: "O0Hys66rpMI",
+        startOffset: 928,
+        endOffset: 1453,
+        safeBounds: [928, 1453],
+        notes: "Serene, idyllic Romance in B-flat major in 4/4 shattered midway by a fierce, tempestuous G minor storm of rushing arpeggios before peace returns."
+      },
+      {
+        id: "mozart-k466-3",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Piano Concerto in D Minor, K. 466",
+        movement: "III. Rondo: Allegro assai",
+        title: "Piano Concerto in D Minor: III. Rondo: Allegro assai",
+        catalog: "K. 466",
+        key: "D Minor",
+        category: "K. 466",
+        type: "Concerto",
+        youtubeId: "O0Hys66rpMI",
+        startOffset: 1453,
+        endOffset: 1958,
+        safeBounds: [1453, 1958],
+        notes: "Fiery rocket-theme rondo in D minor in 2/2; after dramatic struggle and cadenza, the coda turns joyously to D major with cheerful woodwind fanfares."
+      },
+
+      // 13. Piano Concerto in A Major, K. 488 (3)
+      {
+        id: "mozart-k488-1",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Piano Concerto in A Major, K. 488",
+        movement: "I. Allegro",
+        title: "Piano Concerto in A Major: I. Allegro",
+        catalog: "K. 488",
+        key: "A Major",
+        category: "K. 488",
+        type: "Concerto",
+        youtubeId: "rtQGIJJS6FU",
+        startOffset: 0,
+        endOffset: 682,
+        safeBounds: [0, 682],
+        notes: "Luminous, sunny Allegro in 4/4 scored with clarinets instead of oboes; warm dialogue between soloist and woodwinds."
+      },
+      {
+        id: "mozart-k488-2",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Piano Concerto in A Major, K. 488",
+        movement: "II. Adagio",
+        title: "Piano Concerto in A Major: II. Adagio",
+        catalog: "K. 488",
+        key: "F-sharp Minor",
+        category: "K. 488",
+        type: "Concerto",
+        youtubeId: "rtQGIJJS6FU",
+        startOffset: 682,
+        endOffset: 1122,
+        safeBounds: [682, 1122],
+        notes: "Mozart's only work in F-sharp minor: a slow, tragic 6/8 siciliana of incomparable grief, weeping intervals, and quiet transcendence."
+      },
+      {
+        id: "mozart-k488-3",
+        composer: "Wolfgang Amadeus Mozart",
+        work: "Piano Concerto in A Major, K. 488",
+        movement: "III. Allegro assai",
+        title: "Piano Concerto in A Major: III. Allegro assai",
+        catalog: "K. 488",
+        key: "A Major",
+        category: "K. 488",
+        type: "Concerto",
+        youtubeId: "rtQGIJJS6FU",
+        startOffset: 1122,
+        endOffset: 1590,
+        safeBounds: [1122, 1590],
+        notes: "Sparkling, effervescent rondo finale in 2/4 filled with infectious humor, dazzling piano runs, and joyful interplay with winds."
+      }
+    ];
+
     const DECKS = {
       deck1: {
         id: "deck1",
@@ -2238,6 +2830,30 @@
           { value: "Toccata in D Major", label: "Toccata in D Major (1)" }
         ],
         items: LISTENING_TEST_2
+      },
+      deck3: {
+        id: "deck3",
+        name: "Listening Test 3",
+        subtitle: "35 Works / Movements • Haydn & Mozart Sonatas, Concertos & Variations",
+        filterOptions: [
+          { value: "all", label: "All Works & Movements (35)" },
+          { value: "Haydn", label: "All Joseph Haydn (10)" },
+          { value: "Mozart", label: "All W. A. Mozart (25)" },
+          { value: "Hob. XVI:20", label: "Haydn: Sonata in C Minor, Hob. XVI:20 (3)" },
+          { value: "Hob. XVI:50", label: "Haydn: Sonata in C Major, Hob. XVI:50 (3)" },
+          { value: "Hob. XVI:52", label: "Haydn: Sonata in E-flat Major, Hob. XVI:52 (3)" },
+          { value: "Hob. XVII:6", label: "Haydn: Andante con variazioni, Hob. XVII:6 (1)" },
+          { value: "K. 310", label: "Mozart: Sonata in A Minor, K. 310 (3)" },
+          { value: "K. 311", label: "Mozart: Sonata in D Major, K. 311 (3)" },
+          { value: "K. 331", label: "Mozart: Sonata in A Major, K. 331 (3)" },
+          { value: "K. 333", label: "Mozart: Sonata in B-flat Major, K. 333 (3)" },
+          { value: "K. 457", label: "Mozart: Sonata in C Minor, K. 457 (3)" },
+          { value: "K. 576", label: "Mozart: Sonata in D Major, K. 576 (3)" },
+          { value: "K. 511", label: "Mozart: Rondo in A Minor, K. 511 (1)" },
+          { value: "K. 466", label: "Mozart: Piano Concerto in D Minor, K. 466 (3)" },
+          { value: "K. 488", label: "Mozart: Piano Concerto in A Major, K. 488 (3)" }
+        ],
+        items: LISTENING_TEST_3
       }
     };
 
@@ -2392,7 +3008,7 @@
       deckId: 'deck1',
       repertoire: LISTENING_TEST_1,
       orderMode: 'anki',    // 'anki' (SRS) | 'shuffle' (Random quiz) | 'playlist' (Continuous auto-advance)
-      answerMode: 'mc',     // 'mc' | 'type' | 'self'
+      answerMode: 'type',    // 'type' | 'self'
       composerFilter: 'all',
       snippetLength: 40,
       
@@ -2801,11 +3417,30 @@
         }
       }
 
-      // Match catalog number (e.g. "881", "bwv 881", "886", "bwv 886", "k96")
-      const catNorm = card.catalog.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (cleanInput === catNorm || (cleanInput.length >= 3 && catNorm.includes(cleanInput))) {
-        return true;
+      // 5. Exception: Haydn Andante con variazioni in F Minor (Hob. XVII:6)
+      if (card.catalog === 'Hob. XVII:6' || card.category === 'Hob. XVII:6' || (card.title && /variazioni|xvii:?6/i.test(card.title))) {
+        if (/variations?|andante|hob\s*xvii:?6|xvii:?6|17:?6/i.test(rawInput) || cleanInput === 'f' || cleanInput === 'fm' || cleanInput === 'fmin' || cleanInput === 'fminor') {
+          return true;
+        }
       }
+
+      // 6. Exception: Mozart Rondo in A Minor (K. 511)
+      if (card.catalog === 'K. 511' || card.category === 'K. 511' || (card.title && /rondo\s+in\s+a\s+minor|k\.?\s*511/i.test(card.title))) {
+        if (/rondo|k\s*511|511/i.test(rawInput) || cleanInput === 'a' || cleanInput === 'am' || cleanInput === 'amin' || cleanInput === 'aminor') {
+          return true;
+        }
+      }
+
+      // 7. Exception: Mozart Alla Turca / Turkish March (K. 331 III)
+      if (card.movement && /alla\s*turca/i.test(card.movement)) {
+        if (/turca|turkish/i.test(rawInput)) {
+          return true;
+        }
+      }
+
+      // Match catalog number (e.g. "881", "bwv 881", "886", "bwv 886", "k96", "k310", "xvi20")
+      const catNorm = card.catalog.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const catNumberOnly = card.catalog.toLowerCase().replace(/[^0-9]/g, '');
 
       // Card Key Decomposition
       const normCardKey = normalizePitch(card.key);
@@ -2828,44 +3463,109 @@
         if (!isMinor && (cleanInput.includes('maj') || (!cleanInput.includes('min') && !cleanInput.endsWith('m')))) hasKey = true;
       }
 
-      // Raw key match (e.g. "a flat", "f minor", "a-flat major")
+      // Raw key match (e.g. "a flat", "f minor", "a-flat major", "e-flat")
       const rawKeyClean = card.key.toLowerCase().replace(/[^a-z]/g, '');
       const rawInputClean = rawInput.toLowerCase().replace(/[^a-z]/g, '');
       if (rawInputClean.includes(rawKeyClean)) {
         hasKey = true;
       }
 
-      // 5. Major keyboard works that REQUIRE identifying movement AND key (Partita No. 2, English Suite No. 2, French Suite No. 6)
-      const requiresMovementAndKey = card.movement && 
+      // Determine if input matches work / catalog
+      let hasWork = false;
+      if (cleanInput === catNorm || (cleanInput.length >= 3 && catNorm.includes(cleanInput))) {
+        hasWork = true;
+      } else if (catNumberOnly.length >= 3 && cleanInput.includes(catNumberOnly)) {
+        hasWork = true;
+      } else if (card.work && /xvi:?20|xvi:?50|xvi:?52|k\.?310|k\.?311|k\.?331|k\.?333|k\.?457|k\.?576|k\.?466|k\.?488|bwv\s*826|bwv\s*807|bwv\s*817|partita|english\s*suite|french\s*suite/i.test(rawInput)) {
+        hasWork = true;
+      }
+
+      // 7. Multi-movement works that REQUIRE identifying movement (Suites, Partitas, Classical Sonatas & Concertos)
+      const requiresMovement = card.movement && 
         card.category !== 'WTC II Preludes' && 
         card.category !== 'WTC II Fugues' && 
         card.category !== 'Italian Concerto' && 
         card.category !== 'Chromatic Fantasia & Fugue' && 
+        card.category !== 'Hob. XVII:6' &&
+        card.category !== 'K. 511' &&
         card.catalog !== 'BWV 971' && 
-        card.catalog !== 'BWV 903';
+        card.catalog !== 'BWV 903' &&
+        card.catalog !== 'Hob. XVII:6' &&
+        card.catalog !== 'K. 511';
 
-      if (requiresMovementAndKey) {
-        const normMovement = card.movement.toLowerCase()
-          .replace(/^[ivx]+\.\s*/, '')
-          .replace(/\s*\(.*\)/, '')
-          .replace(/bourr[eé]e\s*i(&|\+)?\s*ii/i, 'bourree')
-          .trim();
+      if (requiresMovement) {
+        const movStr = card.movement.toLowerCase();
 
-        const movKeyword = normMovement.split(' ')[0];
-        const hasMovement = normInput.includes(movKeyword) ||
-                            (movKeyword.startsWith('bourr') && normInput.includes('bourr')) ||
-                            (movKeyword.startsWith('menuet') && (normInput.includes('menuet') || normInput.includes('minuet')));
+        // Check movement number: 1 / I, 2 / II, 3 / III
+        let movNum = 0;
+        if (/^i\b|^1\b|first|\b1st\b/i.test(card.movement)) movNum = 1;
+        else if (/^ii\b|^2\b|second|\b2nd\b/i.test(card.movement)) movNum = 2;
+        else if (/^iii\b|^3\b|third|\b3rd\b/i.test(card.movement)) movNum = 3;
 
-        // Must identify movement AND key!
-        if (hasMovement && hasKey) return true;
+        let hasMovNum = false;
+        if (movNum === 1 && (/\b(1|1st|first|i|mov\s*1|mvmt\s*1|movement\s*1)\b/i.test(rawInput) || /\bmov\s*1\b|\bmvmt\s*1\b/i.test(rawInput))) {
+          hasMovNum = true;
+        } else if (movNum === 2 && (/\b(2|2nd|second|ii|mov\s*2|mvmt\s*2|movement\s*2)\b/i.test(rawInput) || /\bmov\s*2\b|\bmvmt\s*2\b/i.test(rawInput))) {
+          hasMovNum = true;
+        } else if (movNum === 3 && (/\b(3|3rd|third|iii|mov\s*3|mvmt\s*3|movement\s*3)\b/i.test(rawInput) || /\bmov\s*3\b|\bmvmt\s*3\b/i.test(rawInput))) {
+          hasMovNum = true;
+        }
+
+        // Check dance / tempo / character keywords
+        let hasMovName = false;
+        const lowerInput = rawInput.toLowerCase();
+
+        if (movStr.includes('moderato') && lowerInput.includes('moderato')) hasMovName = true;
+        if (movStr.includes('adagio') && lowerInput.includes('adagio')) hasMovName = true;
+        if (movStr.includes('andante') && (lowerInput.includes('andante') || lowerInput.includes('cantabile') || lowerInput.includes('grazioso'))) hasMovName = true;
+        if (movStr.includes('presto') && lowerInput.includes('presto')) hasMovName = true;
+        if (movStr.includes('allegretto') && lowerInput.includes('allegretto')) hasMovName = true;
+        if (movStr.includes('romance') && (lowerInput.includes('romance') || lowerInput.includes('romanze'))) hasMovName = true;
+        if (movStr.includes('turca') && (lowerInput.includes('turca') || lowerInput.includes('turkish'))) hasMovName = true;
+        if (movStr.includes('menuetto') && (lowerInput.includes('menuet') || lowerInput.includes('minuet') || lowerInput.includes('trio'))) hasMovName = true;
+        if ((movStr.includes('rondo') || movStr.includes('rondeau')) && (lowerInput.includes('rondo') || lowerInput.includes('rondeau'))) hasMovName = true;
+        if (movStr.includes('sinfonia') && (lowerInput.includes('sinfonia') || lowerInput.includes('overture') || lowerInput.includes('grave'))) hasMovName = true;
+        if (movStr.includes('allemande') && lowerInput.includes('allemande')) hasMovName = true;
+        if (movStr.includes('courante') && (lowerInput.includes('courante') || lowerInput.includes('corrente'))) hasMovName = true;
+        if (movStr.includes('sarabande') && lowerInput.includes('sarabande')) hasMovName = true;
+        if (movStr.includes('gavotte') && lowerInput.includes('gavotte')) hasMovName = true;
+        if (movStr.includes('polonaise') && lowerInput.includes('polonaise')) hasMovName = true;
+        if (movStr.includes('bourr') && lowerInput.includes('bourr')) hasMovName = true;
+        if (movStr.includes('gigue') && lowerInput.includes('gigue')) hasMovName = true;
+        if (movStr.includes('capriccio') && lowerInput.includes('capriccio')) hasMovName = true;
+
+        // Allegro disambiguation (e.g. Allegro vs Allegro assai / Allegro molto)
+        if (movStr.includes('allegro')) {
+          const isAssaiOrMolto = movStr.includes('assai') || movStr.includes('molto');
+          if (isAssaiOrMolto) {
+            if (lowerInput.includes('assai') || lowerInput.includes('molto') || lowerInput.includes('finale')) {
+              hasMovName = true;
+            } else if (lowerInput.includes('allegro') && (hasMovNum || lowerInput.includes('finale'))) {
+              hasMovName = true;
+            }
+          } else {
+            // First movement Allegro
+            if (lowerInput.includes('allegro') && !lowerInput.includes('assai') && !lowerInput.includes('molto') && !lowerInput.includes('finale') && !lowerInput.includes('3')) {
+              hasMovName = true;
+            }
+          }
+        }
+
+        const movementIdentified = hasMovNum || hasMovName;
+
+        // Must identify movement AND (key OR work)!
+        if (movementIdentified && (hasKey || hasWork)) {
+          return true;
+        }
 
         return false;
       }
 
-      // 6. Standard pieces & works where movement is not required (Scarlatti Sonatas, WTC Preludes & Fugues, Italian Concerto, Chromatic Fantasia)
+      // 8. Standard pieces where movement is not required
       if (hasKey) return true;
+      if (hasWork) return true;
 
-      // Match piece title keyword (e.g. "prelude in f minor", "prelude in a flat")
+      // Match piece title keyword
       const titleClean = card.title.toLowerCase();
       if (rawInput.length >= 5 && titleClean.includes(rawInput.toLowerCase())) return true;
       if (card.work && rawInput.length >= 5 && card.work.toLowerCase().includes(rawInput.toLowerCase())) return true;
@@ -2896,71 +3596,6 @@
         document.getElementById('pl-nextup').textContent = `Next Up: ${nextCardObj.composer.split(' ').pop()} — ${nextCardObj.title} (${nextCardObj.catalog})`;
       }
 
-      // Multiple Choice Grid setup: pick 3 distinct distractors
-      const isWorkWithoutMov = (c) => (c.catalog === 'BWV 971' || c.catalog === 'BWV 903' || c.category === 'Italian Concerto' || c.category === 'Chromatic Fantasia & Fugue');
-
-      const distractors = AppState.repertoire.filter(p => {
-        if (p.id === card.id) return false;
-        // Avoid other movements of the same work when movement ID is not required
-        if (isWorkWithoutMov(card) && (p.catalog === card.catalog || p.category === card.category)) {
-          return false;
-        }
-        return true;
-      });
-
-      for (let i = distractors.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [distractors[i], distractors[j]] = [distractors[j], distractors[i]];
-      }
-
-      // Deduplicate works without movement requirement among distractors
-      const pickedDistractors = [];
-      const seenCatalogs = new Set();
-      if (isWorkWithoutMov(card)) seenCatalogs.add(card.catalog);
-
-      for (const d of distractors) {
-        if (isWorkWithoutMov(d)) {
-          if (seenCatalogs.has(d.catalog)) continue;
-          seenCatalogs.add(d.catalog);
-        }
-        pickedDistractors.push(d);
-        if (pickedDistractors.length === 3) break;
-      }
-
-      const opts = [card, ...pickedDistractors];
-      for (let i = opts.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [opts[i], opts[j]] = [opts[j], opts[i]];
-      }
-
-      const grid = document.getElementById('choices-grid');
-      grid.innerHTML = '';
-      const letters = ['A', 'B', 'C', 'D'];
-
-      opts.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        btn.setAttribute('data-id', opt.id);
-        btn.setAttribute('data-idx', idx);
-
-        let subTitle = opt.title;
-        if (opt.catalog === 'BWV 971' || opt.category === 'Italian Concerto') {
-          subTitle = 'Italian Concerto';
-        } else if (opt.catalog === 'BWV 903' || opt.category === 'Chromatic Fantasia & Fugue') {
-          subTitle = 'Chromatic Fantasia & Fugue';
-        }
-
-        btn.innerHTML = `
-          <span class="choice-kbd">${letters[idx]}</span>
-          <div class="choice-text">
-            <span class="choice-key">${opt.key}</span>
-            <span class="choice-sub">${subTitle} (${opt.catalog})</span>
-          </div>
-        `;
-        btn.onclick = () => selectChoice(opt.id, btn);
-        grid.appendChild(btn);
-      });
-
       // Reset Type Key View
       const inp = document.getElementById('type-key-input');
       const feed = document.getElementById('type-key-feedback');
@@ -2972,8 +3607,12 @@
           inp.placeholder = "Type 'Italian Concerto' or key (e.g. F Major, Dm) ↵";
         } else if (card.catalog === 'BWV 903' || card.category === 'Chromatic Fantasia & Fugue') {
           inp.placeholder = "Type 'Chromatic Fantasia' or key (D Minor) ↵";
+        } else if (card.catalog === 'Hob. XVII:6' || card.category === 'Hob. XVII:6') {
+          inp.placeholder = "Type 'Variations' or key (F Minor) ↵";
+        } else if (card.catalog === 'K. 511' || card.category === 'K. 511') {
+          inp.placeholder = "Type 'Rondo' or key (A Minor) ↵";
         } else if (card.movement && card.category !== 'WTC II Preludes' && card.category !== 'WTC II Fugues') {
-          inp.placeholder = "Type movement & key (e.g. Sarabande C Minor, Allemande E) ↵";
+          inp.placeholder = "Type movement & key (e.g. Allegro C Minor, II F Major, Adagio) ↵";
         } else {
           inp.placeholder = "Type key or piece name (e.g. D Minor, D, C# Maj...) ↵";
         }
@@ -2981,23 +3620,6 @@
       if (feed) feed.style.display = 'none';
 
       updateAnswerModeViews();
-    }
-
-    function selectChoice(id, btn) {
-      if (AppState.mcAnswered) return;
-      AppState.mcAnswered = true;
-      const card = getCurrentCard();
-      const isCorrect = (id === card.id);
-
-      document.querySelectorAll('.choice-btn').forEach(b => {
-        b.disabled = true;
-        if (b.getAttribute('data-id') === card.id) b.classList.add('correct');
-        else if (b === btn && !isCorrect) b.classList.add('wrong');
-      });
-
-      showToast(isCorrect ? "✓ Correct!" : "✕ Incorrect — see highlighted answer");
-      const flipBtn = document.getElementById('btn-flip-front');
-      flipBtn.textContent = isCorrect ? '✓ Correct! Reveal Full Solution (↵)' : '✕ Reveal Full Solution (↵)';
     }
 
     function submitTypeKey() {
@@ -3035,30 +3657,21 @@
 
       if (isPlaylist) return;
 
-      const isMC = AppState.answerMode === 'mc';
       const isType = AppState.answerMode === 'type';
       const isSelf = AppState.answerMode === 'self';
 
-      document.getElementById('btn-ans-mc').classList.toggle('active', isMC);
-      document.getElementById('btn-ans-type').classList.toggle('active', isType);
-      document.getElementById('btn-ans-self').classList.toggle('active', isSelf);
+      const typeBtn = document.getElementById('btn-ans-type');
+      if (typeBtn) typeBtn.classList.toggle('active', isType);
+      const selfBtn = document.getElementById('btn-ans-self');
+      if (selfBtn) selfBtn.classList.toggle('active', isSelf);
 
-      document.getElementById('choices-grid').style.display = isMC ? 'grid' : 'none';
-      document.getElementById('type-key-view').style.display = isType ? 'flex' : 'none';
-      document.getElementById('btn-flip-front').style.display = isSelf ? 'inline-flex' : 'inline-flex';
+      const typeView = document.getElementById('type-key-view');
+      if (typeView) typeView.style.display = isType ? 'flex' : 'none';
+      const flipBtn = document.getElementById('btn-flip-front');
+      if (flipBtn) flipBtn.style.display = isSelf ? 'inline-flex' : 'none';
 
       if (isType) {
-        const currentCard = getCurrentCard();
         const inp = document.getElementById('type-key-input');
-        if (inp && currentCard) {
-          if (currentCard.catalog === 'BWV 988' || (currentCard.title && currentCard.title.includes('Goldberg'))) {
-            inp.placeholder = "Type 'Goldberg Variations' (or key) ↵";
-          } else if (currentCard.movement && currentCard.category !== 'WTC II Preludes' && currentCard.category !== 'WTC II Fugues') {
-            inp.placeholder = "Type movement & key (e.g. Sarabande C Minor, Andante Dm) ↵";
-          } else {
-            inp.placeholder = "Type key (e.g. D Minor, D, C# Maj...) ↵";
-          }
-        }
         setTimeout(() => {
           if (inp) inp.focus();
         }, 80);
@@ -3263,20 +3876,21 @@
 
     function setOrderMode(mode) {
       AppState.orderMode = mode;
-      const orderBtn = document.getElementById('btn-mode-order');
-      if (orderBtn) orderBtn.classList.toggle('active', mode === 'order');
-      document.getElementById('btn-mode-anki').classList.toggle('active', mode === 'anki');
-      document.getElementById('btn-mode-shuffle').classList.toggle('active', mode === 'shuffle');
-      document.getElementById('btn-mode-playlist').classList.toggle('active', mode === 'playlist');
+      const ankiBtn = document.getElementById('btn-mode-anki');
+      if (ankiBtn) ankiBtn.classList.toggle('active', mode === 'anki');
+      const shuffleBtn = document.getElementById('btn-mode-shuffle');
+      if (shuffleBtn) shuffleBtn.classList.toggle('active', mode === 'shuffle');
+      const plBtn = document.getElementById('btn-mode-playlist');
+      if (plBtn) plBtn.classList.toggle('active', mode === 'playlist');
 
       if (mode === 'playlist') {
         AppState.snippetLength = 999;
         document.getElementById('snippet-select').value = "999";
         showToast("🎧 Playlist: Playing full movements in sequential order");
-      } else if (mode === 'order') {
-        showToast("📖 In Order: Studying movements in canonical sequence");
       } else if (mode === 'shuffle') {
         showToast("🔀 Shuffle Quiz: Randomizing cards");
+      } else if (mode === 'anki') {
+        showToast("⚡ Anki SRS: Smart spaced repetition review");
       }
 
       buildDeck();
@@ -3410,8 +4024,6 @@
       document.getElementById('deck-select').onchange = (e) => switchDeck(e.target.value);
 
       // Study Modes
-      const orderBtn = document.getElementById('btn-mode-order');
-      if (orderBtn) orderBtn.onclick = () => setOrderMode('order');
       document.getElementById('btn-mode-anki').onclick = () => setOrderMode('anki');
       document.getElementById('btn-mode-shuffle').onclick = () => setOrderMode('shuffle');
       document.getElementById('btn-mode-playlist').onclick = () => setOrderMode('playlist');
@@ -3420,13 +4032,14 @@
       document.getElementById('btn-reset-progress-header').onclick = resetLearningProgress;
 
       // Answer Modes
-      document.getElementById('btn-ans-mc').onclick = () => { AppState.answerMode = 'mc'; updateAnswerModeViews(); };
       document.getElementById('btn-ans-type').onclick = () => { AppState.answerMode = 'type'; updateAnswerModeViews(); };
       document.getElementById('btn-ans-self').onclick = () => { AppState.answerMode = 'self'; updateAnswerModeViews(); };
 
-      // Type Key Submit
+      // Type Key Submit & Give Up
       document.getElementById('btn-type-key-submit').onclick = submitTypeKey;
       document.getElementById('type-key-input').onkeydown = (e) => { if (e.key === 'Enter') submitTypeKey(); };
+      const giveUpBtn = document.getElementById('btn-give-up');
+      if (giveUpBtn) giveUpBtn.onclick = () => flipTo('back');
 
       // Dropdowns
       document.getElementById('snippet-select').onchange = (e) => {
@@ -3470,12 +4083,6 @@
           if (e.key === '2') { e.preventDefault(); gradeCard(2); return; }
           if (e.key === '3') { e.preventDefault(); gradeCard(3); return; }
           if (e.key === '4') { e.preventDefault(); gradeCard(4); return; }
-        } else if (AppState.orderMode !== 'playlist' && AppState.answerMode === 'mc' && !AppState.mcAnswered) {
-          const map = { 'KeyA': 0, 'KeyB': 1, 'KeyC': 2, 'KeyD': 3, 'Digit1': 0, 'Digit2': 1, 'Digit3': 2, 'Digit4': 3 };
-          if (map[e.code] !== undefined) {
-            const btn = document.querySelector(`.choice-btn[data-idx="${map[e.code]}"]`);
-            if (btn) { e.preventDefault(); btn.click(); return; }
-          }
         }
 
         switch (e.code) {
